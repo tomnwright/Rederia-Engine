@@ -1,36 +1,48 @@
 import tkinter
+from tkinter import ttk
+from ria_ui import *
 import win_render
-
+global obj_pad
+obj_pad = 5
 class main(tkinter.Frame):
 
     def __init__(self, master=None):
-        tkinter.Frame.__init__(self, master)
+        super().__init__(master)
         self.master = master
+        
         self.init_win()
+        self.init_menu(self.master)
+    def init_right(self,right):
+        #currently called from self.init_win
+        obj1 = ObjectList(right,bg_color='gray')
+        obj1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        btn1 = tkinter.Menubutton(
+            right,
+            text='Add Object',
+            height = obj1.winfo_height())
+        a_men = self.init_addmenu(btn1)
+        btn1['menu'] = a_men
+        btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
     def init_win(self):
 
         self.master.iconbitmap("graphics/icon/icon_03.ico")
         self.master.title("render.ia")
         self.master.geometry("1000x500")
         self.master.minsize(500,250)
-        self.init_menu(self.master)
-        #self.testimg = tkinter.BitmapImage(file = 'graphics/interface/add.bmp')
         panes = tkinter.PanedWindow(self.master,orient='horizontal')
         panes.pack(side='bottom',fill='both',expand=1)
 
         left = tkinter.Frame(panes,bg='blue')
         panes.add(left,minsize=250)
-        right = tkinter.Frame(panes,bg='red')
+        right = tkinter.Frame(
+            panes,
+            bg='red',
+            padx=obj_pad,
+            pady=obj_pad)
         panes.add(right,minsize=250)
 
+        self.init_right(right)
         #add button on right
-        """btn_add = tkinter.Button(right, text='New Object',relief = 'flat')
-        btn_add.pack(side='bottom',fill='both',padx=10,pady=10)
-
-        btn_edit = tkinter.Button(right, text='Edit',relief = 'flat')
-        btn_edit.pack(side='bottom',fill='both',padx=10,pady=10,expand=1)"""
-
-        #self.init_editmenu(right)
     def init_menu(self,root):
 
         menubar = tkinter.Menu(root)
@@ -76,14 +88,7 @@ class main(tkinter.Frame):
         object_menu.add_command(label = 'Delete')
         object_menu.add_separator()
         #New section
-        new_menu = tkinter.Menu(object_menu,tearoff=0)
-        new_menu.add_command(label = 'Plane')
-        new_menu.add_command(label = 'Cube')
-        new_menu.add_command(label = 'UV Sphere')
-        new_menu.add_command(label = 'Ico Sphere')
-        new_menu.add_separator()
-        new_menu.add_command(label = 'Graph')
-        object_menu.add_cascade(label = 'Insert',menu = new_menu)
+        object_menu.add_cascade(label = 'Add',menu = self.init_addmenu(object_menu))
         #Import
         import_menu = tkinter.Menu(object_menu,tearoff=0)
         import_menu.add_command(label = 'Wavefront (OBJ)')
@@ -99,6 +104,16 @@ class main(tkinter.Frame):
         menubar.add_command(label = 'Render Image')
 
         root.config(menu=menubar)
+    def init_addmenu(self,root):
+        add_menu = tkinter.Menu(root,tearoff=0)
+        add_menu.add_command(label = 'Plane')
+        add_menu.add_command(label = 'Cube')
+        add_menu.add_command(label = 'UV Sphere')
+        add_menu.add_command(label = 'Ico Sphere')
+        add_menu.add_separator()
+        add_menu.add_command(label = 'Graph')
+        return add_menu
+
 
         
 if __name__=='__main__':

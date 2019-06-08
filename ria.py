@@ -71,4 +71,3 @@ class PolyOBJ(Object3D):
 
 
 import ria_objs
-objects = []
