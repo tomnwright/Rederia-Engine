@@ -1,4 +1,5 @@
-import ria_objs,ria_misctools
+import misctools
+
 class Vector3:
     def __init__(self,x=0,y=0,z=0):
         self.x = x
@@ -51,17 +52,17 @@ class Object3D:
         self,
         master,
         name,
-        position = Vector3.zero,
+        location = Vector3.zero,
         rotation = Vector3.zero,
         size = Vector3.unit):
         #___________________
         self.master = master
         self.set_name(name)
-        self.position = position
+        self.location = location
         self.rotation = rotation
         self.size = size
     def translate(self):#, tA):
-        #self.position += tA
+        #self.location += tA
         print('{} will be translated'.format(self.name))
     def rotate(self):#, rA):
         #self.rotation += rA
@@ -72,22 +73,50 @@ class Object3D:
     def set_name(self,new_name):
         names = [i.name for i in self.master.objects]
         while new_name in names:
-            new_name = ria_misctools.increment(new_name)
+            new_name = misctools.increment(new_name)
         self.name = new_name
         return self.name
+    def delete(self):
+        self.master.remove_object(self)
+    def toggle_select(self, display_inst):
+        print('select')
         
-        
+class MeshObject(Object3D):
+    #restructure to include mesh
+    def __init__(self,*args,mesh,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.mesh = mesh
+
+class Mesh:
+    #restructure to include mesh
+    def __init__(self, vertices, faces):
+        self.vertices = vertices
+        self.faces = faces
+    def global_space(self,master):
+        gVs = []
+        for vertex in self.vertices:
+            n = vertex.vector_scale(master.size)
+            n += master.location
+            gVs.append(n)
+        return gVs
+
+
 
 class ObjectMaster:
     def __init__(self):
         self.objects = []
-    def add_object(self, obj_name):
-        new_obj = Object3D(self,obj_name)
+        self.active = None
+        self.selected = []
+    def add_object(self, new_obj):
         self.objects.append(new_obj)
         return new_obj
+    def remove_object(self,object_instance):
+        self.objects.remove(object_instance)
     def ls_objs(self):
         print([i.name for i in self.objects])
 
+
+from ria_objs import *
 if __name__ == '__main__':
     handlers = []
     handler = ObjectMaster()

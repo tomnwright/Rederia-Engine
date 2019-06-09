@@ -24,6 +24,7 @@ class main(tkinter.Frame):
         #left
         left = tkinter.Frame(panes,bg='blue')
         panes.add(left,minsize=250)
+        tkinter.Label(left,text='3D Viewer').place(x=100,y=100)
 
         #right
         self.right_frame = tkinter.Frame(panes,bg='red')
@@ -44,6 +45,7 @@ class main(tkinter.Frame):
         self.obj_canvas.bind('<Configure>',self.objcanvas_width)
     def init_ria(self):
         self.handler = ria.ObjectMaster()
+        self.images = Style.images()
 
     def init_menubar(self,root):
 
@@ -93,20 +95,22 @@ class main(tkinter.Frame):
         btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
     def init_addmenu(self,root):
         add_menu = tkinter.Menu(root,tearoff=0)
-        add_menu.add_command(label = 'Camera')
+        add_menu.add_command(label = 'Camera',command = lambda: add_funcs.camera(self,self.obj_frame))
         #lights
         light_menu = tkinter.Menu(add_menu, tearoff=0)
-        light_menu.add_command(label = 'Point')
-        light_menu.add_command(label = 'Directional')
+        light_menu.add_command(label = 'Point',command = lambda: add_funcs.point(self,self.obj_frame))
+        light_menu.add_command(label = 'Directional',command = lambda: add_funcs.directional(self,self.obj_frame))
         add_menu.add_cascade(label = 'Light',menu =light_menu)
+        add_menu.add_command(label = 'Plain Axis',command = lambda: add_funcs.empty(self,self.obj_frame))
         add_menu.add_separator()
 
-        add_menu.add_command(label = 'Plane')
-        add_menu.add_command(label = 'Cube',command = self.add_cube)
-        add_menu.add_command(label = 'UV Sphere')
-        add_menu.add_command(label = 'Ico Sphere')
+        add_menu.add_command(label = 'Plane',command = lambda: add_funcs.plane(self,self.obj_frame))
+        add_menu.add_command(label = 'Cube',command = lambda: add_funcs.cube(self,self.obj_frame))
+        add_menu.add_command(label = 'UV Sphere',command = lambda: add_funcs.uvs(self,self.obj_frame))
+        add_menu.add_command(label = 'Ico Sphere',command = lambda: add_funcs.ico(self,self.obj_frame))
+        add_menu.add_command(label = 'Cylinder',command = lambda: add_funcs.cylinder(self,self.obj_frame))
         add_menu.add_separator()
-        add_menu.add_command(label = 'Graph')
+        add_menu.add_command(label = 'Curve',command = lambda: add_funcs.curve(self,self.obj_frame))
         return add_menu
     def init_objmenu(self,root):
         object_menu = tkinter.Menu(root,tearoff=0)
@@ -128,7 +132,7 @@ class main(tkinter.Frame):
         object_menu.add_cascade(label = 'Add',menu = self.init_addmenu(object_menu))
         #Import
         import_menu = tkinter.Menu(object_menu,tearoff=0)
-        import_menu.add_command(label = 'Wavefront (OBJ)')
+        import_menu.add_command(label = 'Wavefront (OBJ)',command = lambda: add_funcs.poly(self,self.obj_frame))
         object_menu.add_cascade(label='Import',menu = import_menu)
         #Export
         export_menu = tkinter.Menu(object_menu,tearoff=0)
@@ -144,10 +148,9 @@ class main(tkinter.Frame):
     def objcanvas_width(self, event):
         canvas_width = event.width
         self.obj_canvas.itemconfig(self.obj_frameCANV, width = canvas_width)
-        self.obj_canvas.configure(scrollregion=self.obj_canvas.bbox("all"))
-    class add_func:
-        def add_cube(self):
-            Add.cube(self.handler,self.obj_frame)
+        self.update_scroll(self.obj_canvas)
+    def update_scroll(self,scrollable):
+        scrollable.configure(scrollregion=scrollable.bbox("all"))
 if __name__=='__main__':
     app = main(tkinter.Tk())
     app.mainloop()

@@ -19,5 +19,5 @@ def parse_obj(f_path):
                 Fs.append(face)
     return Vs, Fs
 
-v,f = parse_obj('tests/unit_cube.obj')
+v,f = parse_obj('tests/unit_plane.obj')
 print([str(i) for i in v], f)

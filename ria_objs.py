@@ -1,21 +1,41 @@
-from ria import *
-"""
-class cube(PolyOBJ):
-    def __init__(self, position = Vector3.zero, rotation = Vector3.zero, size = Vector3.unit):
-        Vs = [
-            Vector3(-1.0, -1.0, 1.0),
-            Vector3(-1.0, 1.0, 1.0),
-            Vector3(-1.0, -1.0, -1.0),
-            Vector3(-1.0, 1.0, -1.0),
-            Vector3(1.0, -1.0, 1.0),
-            Vector3(1.0, 1.0, 1.0),
-            Vector3(1.0, -1.0, -1.0),
-            Vector3(1.0, 1.0, -1.0)]
-        Fs = [
-            [1, 2, 4, 3],
-            [3, 4, 8, 7],
-            [7, 8, 6, 5],
-            [5, 6, 2, 1],
-            [3, 7, 5, 1],
-            [8, 4, 2, 6]]
-        super().__init__(Vs,Fs,position,rotation,size)"""
+import ria
+import mesh
+#__Mesh Objects____________________
+class Cube(ria.MeshObject):
+    def __init__(self, master,name,*args,**kwargs):
+        super().__init__(master,name,*args,mesh = mesh.cube(),**kwargs)
+
+class Plane(ria.MeshObject):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,mesh = mesh.plane(),**kwargs)
+    #REQUIRE UPDATING
+class Cylinder(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Sphere(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Icosphere(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Poly(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+
+
+#__Other__________________________
+class Empty(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Curve(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Camera(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Directional(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
+class Point(ria.Object3D):
+    def __init__(self, master, name, *args,**kwargs):
+        super().__init__(master,name,*args,**kwargs)
