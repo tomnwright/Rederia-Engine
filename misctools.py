@@ -24,7 +24,9 @@ def retag(tag, *args):
     '''Add the given tag as the first bindtag for every widget passed in'''
     for widget in args:
         widget.bindtags((tag,) + widget.bindtags())
-    
+def select(selected,obj):
+    if obj not in selected:
+        selected.append(obj)
 def parse_obj(f_path):
     Vs = []
     Fs = []

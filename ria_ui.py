@@ -15,32 +15,31 @@ class ObjectFrame(tkinter.Frame):
         #defining buttons
         self.del_btn = tkinter.Button(
             self,
-            command = self.delete,
+            command = self.obj.delete,
             **Style.button.delete(self.symbols))
         self.tnf_btn = tkinter.Button(
             self,
             **Style.button.transform(self.symbols))
         self.ppt_btn = tkinter.Button(
             self,
-            command = self.properties_temp,
+            command = self.obj.properties_temp,
             **Style.button.properties(self.symbols))
         #packing buttons
         self.del_btn.pack(side='right',fill='y')
         self.ppt_btn.pack(side='right',fill='y')
         self.tnf_btn.pack(side='right',fill='y')  
         
-        self.nonbtn_container = tkinter.Label(self,bd=0)
         self.symb = tkinter.Label(
-            self.nonbtn_container,
+            self,
             image = icon,
             bg=Style.colors('grey_01'))
         self.symb.pack(side= 'left', fill='y')
-        text_container = tkinter.Frame(
-            self.nonbtn_container,
+        self.text_container = tkinter.Frame(
+            self,
             bg = Style.colors('grey_01'))
         
         self.name = tkinter.Label(
-            text_container,
+            self.text_container,
             background = Style.colors('grey_01'),
             text=self.obj.name,
             justify='left' ,
@@ -51,9 +50,11 @@ class ObjectFrame(tkinter.Frame):
         self.name.bind('<Double-Button-1>',self.rename)
         self.name.pack(side = 'left')
         
-        text_container.pack(side = 'left', fill = 'both', expand=1)
-        self.nonbtn_container.pack(side = 'left', fill = 'both', expand=1)
-        self.nonbtn_container.bind('<Button-1>',lambda: self.obj.toggle_select(self))
+        self.text_container.pack(side = 'left', fill = 'both', expand=1)
+
+        self.text_container.bind('<Button-3>',self.select_passOver)
+        self.symb.bind('<Button-3>',self.select_passOver)
+        self.name.bind('<Button-3>',self.select_passOver)
     def rename(self, event):
         widget = event.widget.master
         entry_widget = tkinter.Entry(
@@ -84,23 +85,21 @@ class ObjectFrame(tkinter.Frame):
     def rename_cancel(self, event):
         entry = event.widget
         entry.destroy()
-    def delete(self):
-        self.obj.delete()
-        self.destroy()
-    def properties_temp(self):
-        print("___OBJ___\nName : {}\nType : {}\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.obj.name,type(self.obj),self.obj.location,self.obj.rotation,self.obj.size))
     def set_active(self):
-        pass
+        self.symb.config(bg = Style.colors('active'))
     def set_selected(self):
-        pass
+        self.symb.config(bg = Style.colors('selected'))
     def set_deselected(self):
-        pass
+        self.symb.config(bg = Style.colors('grey_01'))
+    def select_passOver(self,event):
+        self.obj.toggle_select()
+
 class Style:
     obj_pad = 5
 
     @staticmethod
     def colors(index):
-        pallete = {'grey_01' : '#232323'}
+        pallete = {'grey_01' : '#232323','active':'#E66A1F','selected':'#E6A882'}
         return pallete[index]
     class images:
         def __init__(self):
@@ -157,6 +156,8 @@ class add_funcs:
             obj_container,
             new_obj,
             icon = master.images.cub)
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -170,6 +171,8 @@ class add_funcs:
             new_obj,
             icon = master.images.axi,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
     
@@ -183,6 +186,8 @@ class add_funcs:
             new_obj,
             icon = master.images.cur,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -196,6 +201,8 @@ class add_funcs:
             new_obj,
             icon = master.images.cyl,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -209,6 +216,8 @@ class add_funcs:
             new_obj,
             icon = master.images.dir,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -222,6 +231,8 @@ class add_funcs:
             new_obj,
             icon = master.images.pla,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -235,6 +246,8 @@ class add_funcs:
             new_obj,
             icon = master.images.poi,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -248,6 +261,8 @@ class add_funcs:
             new_obj,
             icon = master.images.pol,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -261,6 +276,8 @@ class add_funcs:
             new_obj,
             icon = master.images.ico,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  
@@ -274,6 +291,8 @@ class add_funcs:
             new_obj,
             icon = master.images.uvs,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
     
@@ -287,6 +306,8 @@ class add_funcs:
             new_obj,
             icon = master.images.cam,
             **Style.ObjectFrame())
+        
+        new_obj.list_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
         master.update_scroll(master.obj_canvas)
  

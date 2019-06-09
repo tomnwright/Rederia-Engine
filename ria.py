@@ -54,13 +54,15 @@ class Object3D:
         name,
         location = Vector3.zero,
         rotation = Vector3.zero,
-        size = Vector3.unit):
+        size = Vector3.unit,
+        list_instance = None):
         #___________________
         self.master = master
         self.set_name(name)
         self.location = location
         self.rotation = rotation
         self.size = size
+        self.list_instance = list_instance
     def translate(self):#, tA):
         #self.location += tA
         print('{} will be translated'.format(self.name))
@@ -77,10 +79,25 @@ class Object3D:
         self.name = new_name
         return self.name
     def delete(self):
+        self.list_instance.destroy()
+        if self in self.master.selected:
+            self.master.selected.remove(self)
+            if self.master.active is self:
+                self.master.active = None
         self.master.remove_object(self)
-    def toggle_select(self, display_inst):
-        print('select')
-        
+    def toggle_select(self):
+        if self.master.active == self:
+            self.master.active = None
+            self.master.selected.remove(self)
+            self.list_instance.set_deselected()
+        else:
+            ria.misctools.select(self.master.selected,self)
+            self.list_instance.set_active()
+            if self.master.active:
+                self.master.active.list_instance.set_selected()
+            self.master.active = self
+    def properties_temp(self):
+        print("___OBJ___\nName : {}\nType : {}\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.name,type(self),self.location,self.rotation,self.size))
 class MeshObject(Object3D):
     #restructure to include mesh
     def __init__(self,*args,mesh,**kwargs):
@@ -114,6 +131,8 @@ class ObjectMaster:
         self.objects.remove(object_instance)
     def ls_objs(self):
         print([i.name for i in self.objects])
+    def debug_selection(self):
+        print('Active: {}\n Selected: {}\n'.format(self.active,[i.name for i in self.selected]))
 
 
 from ria_objs import *

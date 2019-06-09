@@ -124,9 +124,9 @@ class main(tkinter.Frame):
         object_menu.add_cascade(label='Clear',menu=clear_menu)
         object_menu.add_separator()
         #Misc
-        object_menu.add_command(label = 'Properties')
+        object_menu.add_command(label = 'Properties',command = self.properties_temp)
         object_menu.add_command(label = 'Duplicate')
-        object_menu.add_command(label = 'Delete')
+        object_menu.add_command(label = 'Delete', command = self.delete_selected)
         object_menu.add_separator()
         #New section
         object_menu.add_cascade(label = 'Add',menu = self.init_addmenu(object_menu))
@@ -143,6 +143,7 @@ class main(tkinter.Frame):
     def init_debugmenu(self,root):
         debug = tkinter.Menu(root,tearoff=0)
         debug.add_command(label='List objects', command = self.handler.ls_objs)
+        debug.add_command(label='List selected', command = self.handler.debug_selection)
         return debug
 
     def objcanvas_width(self, event):
@@ -151,6 +152,14 @@ class main(tkinter.Frame):
         self.update_scroll(self.obj_canvas)
     def update_scroll(self,scrollable):
         scrollable.configure(scrollregion=scrollable.bbox("all"))
+    def delete_selected(self):
+        while self.handler.selected:
+            self.handler.selected[0].delete()
+        self.handler.selected = []
+        self.handler.active = None
+    def properties_temp(self):
+        if self.handler.active:
+            self.handler.active.properties_temp()
 if __name__=='__main__':
     app = main(tkinter.Tk())
     app.mainloop()
