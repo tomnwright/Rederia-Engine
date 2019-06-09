@@ -1,5 +1,5 @@
 from ria import *
-
+"""
 class cube(PolyOBJ):
     def __init__(self, position = Vector3.zero, rotation = Vector3.zero, size = Vector3.unit):
         Vs = [
@@ -18,4 +18,4 @@ class cube(PolyOBJ):
             [5, 6, 2, 1],
             [3, 7, 5, 1],
             [8, 4, 2, 6]]
-        super().__init__(Vs,Fs,position,rotation,size)
+        super().__init__(Vs,Fs,position,rotation,size)"""

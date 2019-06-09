@@ -1,6 +1,7 @@
 import tkinter
 from tkinter import ttk
 from ria_ui import *
+from tkinter import messagebox as msg
 import win_render
 global obj_pad
 obj_pad = 5
@@ -10,9 +11,25 @@ class main(tkinter.Frame):
         super().__init__(master)
         self.master = master
         
-        self.init_ria()
         self.init_win()
-        self.init_menubar(self.master)    
+        self.init_menubar(self.master)
+        
+    def init_objlist(self,root):
+        #currently called from self.init_win
+        obj2 = ObjectList(root,bg_color='#232323',index = 4)
+        obj2.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        obj2.symb.config(bg = 'orange')
+        for i in range(25):
+            obj = ObjectList(root,bg_color='#232323')
+            obj.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        #add button
+        btn1 = tkinter.Menubutton(
+            root,
+            text='Add Object',
+            height = 30)
+        a_men = self.init_addmenu(btn1)
+        btn1['menu'] = a_men
+        btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
     def init_win(self):
 
         self.master.iconbitmap("graphics/icon/icon_03.ico")
@@ -24,27 +41,93 @@ class main(tkinter.Frame):
         #left
         left = tkinter.Frame(panes,bg='blue')
         panes.add(left,minsize=250)
-
-        #right
-        self.right_frame = tkinter.Frame(panes,bg='red')
-        panes.add(self.right_frame,minsize=250)
-
-        self.obj_canvas = tkinter.Canvas(self.right_frame,width=1,highlightthickness=0,bg='green')
-        self.obj_canvas.pack(side='left',fill='both',expand=1)
-        #scrollbar
-        self.obj_scroll = tkinter.Scrollbar(self.right_frame, orient="vertical", command=self.obj_canvas.yview)
-        self.obj_canvas.config(yscrollcommand=self.obj_scroll.set)
-        self.obj_scroll.pack(side='right',fill='y')
         
-        self.obj_frame = tkinter.Frame(self.obj_canvas)
-        self.obj_frameCANV = self.obj_canvas.create_window((0, 0), window=self.obj_frame, anchor="nw")
+        
+        
+        
+        #from file
+        self.tasks=[]
+        self.tasks_canvas = tkinter.Canvas(panes,bg='red',highlightthickness=0)
 
-        self.init_objlist(self.obj_frame)
+        self.tasks_frame = tkinter.Frame(self.tasks_canvas)
+        self.text_frame = tkinter.Frame(self)
 
-        self.obj_canvas.bind('<Configure>',self.objcanvas_width)
-    def init_ria(self):
-        self.handler = ria.ObjectMaster()
+        self.scrollbar = tkinter.Scrollbar(self.tasks_canvas, orient="vertical", command=self.tasks_canvas.yview)
 
+        self.tasks_canvas.configure(yscrollcommand=self.scrollbar.set)
+
+
+        self.task_create = tkinter.Text(self.text_frame, height=3, bg="white", fg="black")
+
+        panes.add(self.tasks_canvas,minsize=250)
+        self.scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+
+        self.canvas_frame = self.tasks_canvas.create_window((0, 0), window=self.tasks_frame, anchor="n")
+
+        self.task_create.pack(side=tkinter.BOTTOM, fill=tkinter.X)
+        self.text_frame.pack(side=tkinter.BOTTOM, fill=tkinter.X)
+        self.task_create.focus_set()
+
+        self.colour_schemes = [{"bg": "lightgrey", "fg": "black"}, {"bg": "grey", "fg": "white"}]
+
+        current_tasks = ['a','b','c','d','e','f','g','h','i','j','k']
+        for task in current_tasks:
+            task_text = task[0]
+            self.add_task(None, task_text, True)
+
+        self.master.bind("<Configure>", self.on_frame_configure)
+        self.tasks_canvas.bind("<Configure>", self.task_width)
+
+    def add_task(self, event=None, task_text=None, from_db=False):
+        if not task_text:
+            task_text = self.task_create.get(1.0, tkinter.END).strip()
+
+        if len(task_text) > 0:
+            new_task = tkinter.Label(self.tasks_frame, text=task_text, pady=10)
+
+            self.set_task_colour(len(self.tasks), new_task)
+
+            new_task.bind("<Button-1>", self.remove_task)
+            new_task.pack(side=tkinter.TOP, fill=tkinter.X)
+
+            self.tasks.append(new_task)
+
+            if not from_db:
+                self.save_task(task_text)
+
+        self.task_create.delete(1.0, tkinter.END)
+
+    def remove_task(self, event):
+        task = event.widget
+        if msg.askyesno("Really Delete?", "Delete " + task.cget("text") + "?"):
+            self.tasks.remove(event.widget)
+
+            event.widget.destroy()
+
+            self.recolour_tasks()
+
+    def recolour_tasks(self):
+        for index, task in enumerate(self.tasks):
+            self.set_task_colour(index, task)
+
+    def set_task_colour(self, position, task):
+        _, task_style_choice = divmod(position, 2)
+
+        my_scheme_choice = self.colour_schemes[task_style_choice]
+
+        task.configure(bg=my_scheme_choice["bg"])
+        task.configure(fg=my_scheme_choice["fg"])
+
+    def on_frame_configure(self, event=None):
+        self.tasks_canvas.configure(scrollregion=self.tasks_canvas.bbox("all"))
+
+    def task_width(self, event):
+        canvas_width = event.width
+        self.tasks_canvas.itemconfig(self.canvas_frame, width = canvas_width)
+        #self.tasks_canvas.configure(scrollregion=self.tasks_canvas.bbox("all"))
+    def canvasframe_width(self, event):
+        canvas_width = event.width
+        self.R_super_canvas.itemconfig(self.objlist_win, width = canvas_width)
     def init_menubar(self,root):
 
         menubar = tkinter.Menu(root)
@@ -77,20 +160,10 @@ class main(tkinter.Frame):
         object_menu = self.init_objmenu(menubar)
         menubar.add_cascade(label = 'Object', menu=object_menu)
 
-        debug_menu = self.init_debugmenu(menubar)
-        menubar.add_cascade(label='Debug',menu=debug_menu)
-
         menubar.add_separator()
         menubar.add_command(label = 'Render Image')
 
         root.config(menu=menubar)
-    def init_objlist(self,root):
-        btn1 = tkinter.Menubutton(
-            root,
-            text='Add Object',)
-        a_men = self.init_addmenu(btn1)
-        btn1['menu'] = a_men
-        btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
     def init_addmenu(self,root):
         add_menu = tkinter.Menu(root,tearoff=0)
         add_menu.add_command(label = 'Camera')
@@ -102,7 +175,7 @@ class main(tkinter.Frame):
         add_menu.add_separator()
 
         add_menu.add_command(label = 'Plane')
-        add_menu.add_command(label = 'Cube',command = self.add_cube)
+        add_menu.add_command(label = 'Cube')
         add_menu.add_command(label = 'UV Sphere')
         add_menu.add_command(label = 'Ico Sphere')
         add_menu.add_separator()
@@ -136,18 +209,6 @@ class main(tkinter.Frame):
         object_menu.add_cascade(label='Export',menu = export_menu)
         
         return object_menu
-    def init_debugmenu(self,root):
-        debug = tkinter.Menu(root,tearoff=0)
-        debug.add_command(label='List objects', command = self.handler.ls_objs)
-        return debug
-
-    def objcanvas_width(self, event):
-        canvas_width = event.width
-        self.obj_canvas.itemconfig(self.obj_frameCANV, width = canvas_width)
-        self.obj_canvas.configure(scrollregion=self.obj_canvas.bbox("all"))
-    class add_func:
-        def add_cube(self):
-            Add.cube(self.handler,self.obj_frame)
 if __name__=='__main__':
     app = main(tkinter.Tk())
     app.mainloop()

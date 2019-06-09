@@ -1,3 +1,4 @@
+import ria_objs,ria_misctools
 class Vector3:
     def __init__(self,x=0,y=0,z=0):
         self.x = x
@@ -46,28 +47,50 @@ Vector2.unit = Vector2(1,1)
 Vector2.zero = Vector2()
 
 class Object3D:
-    def __init__(self, position = Vector3.zero, rotation = Vector3.zero, size = Vector3.unit):
+    def __init__(
+        self,
+        master,
+        name,
+        position = Vector3.zero,
+        rotation = Vector3.zero,
+        size = Vector3.unit):
+        #___________________
+        self.master = master
+        self.set_name(name)
         self.position = position
         self.rotation = rotation
         self.size = size
-    def translate(self, tA):
-        self.position += tA
-    def rotate(self, rA):
-        self.rotation += rA
-    def scale(self,sA):
-        self.size *= sA
-class PolyOBJ(Object3D):
-    def __init__(self, vertices, faces, position = Vector3.zero, rotation = Vector3.zero, size = Vector3.unit):
-        super().__init__(position,rotation,size)
-        self.vertices = vertices
-        self.faces = faces
-    def global_space(self):
-        gVs = []
-        for vertex in self.vertices:
-            n = vertex.vector_scale(self.size)
-            n += self.position
-            gVs.append(n)
-        return gVs
+    def translate(self):#, tA):
+        #self.position += tA
+        print('{} will be translated'.format(self.name))
+    def rotate(self):#, rA):
+        #self.rotation += rA
+        print('{} will be rotated'.format(self.name))
+    def scale(self):#,sA):
+        #self.size *= sA
+        print('{} will be scaled'.format(self.name))
+    def set_name(self,new_name):
+        names = [i.name for i in self.master.objects]
+        while new_name in names:
+            new_name = ria_misctools.increment(new_name)
+        self.name = new_name
+        return self.name
+        
+        
 
+class ObjectMaster:
+    def __init__(self):
+        self.objects = []
+    def add_object(self, obj_name):
+        new_obj = Object3D(self,obj_name)
+        self.objects.append(new_obj)
+        return new_obj
+    def ls_objs(self):
+        print([i.name for i in self.objects])
 
-import ria_objs
+if __name__ == '__main__':
+    handlers = []
+    handler = ObjectMaster()
+    print(handler)
+    handlers.append(handler)
+    print(handlers[0])
