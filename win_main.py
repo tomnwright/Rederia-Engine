@@ -28,8 +28,6 @@ class main(tkinter.Frame):
         a_men = self.init_addmenu(btn1)
         btn1['menu'] = a_men
         btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
-        #right.bind_class('ObjectList','<Button-3>',self.objmenu_pop)
-        right.bind_all('<Button-3>',self.objmenu_pop)
     def init_win(self):
 
         self.master.iconbitmap("graphics/icon/icon_03.ico")
@@ -103,11 +101,6 @@ class main(tkinter.Frame):
         add_menu.add_separator()
         add_menu.add_command(label = 'Graph')
         return add_menu
-    def objmenu_pop(self,event):
-        print('pop')
-        print(event.widget.bindtags())
-        context = self.init_objcontext()
-        context.tk_popup(event.x_root, event.y_root, 0)
     def init_objmenu(self,root):
         object_menu = tkinter.Menu(root,tearoff=0)
         #Translation
@@ -136,22 +129,6 @@ class main(tkinter.Frame):
         object_menu.add_cascade(label='Export',menu = export_menu)
         
         return object_menu
-    def init_objcontext(self,root=None):
-        object_context = tkinter.Menu(root,tearoff=0)
-        #Translation
-        object_context.add_command(label = 'Transform')
-        #Clear menu
-        clear_menu = tkinter.Menu(object_context,tearoff=0)
-        clear_menu.add_command(label = 'Location')
-        clear_menu.add_command(label = 'Rotation')
-        clear_menu.add_command(label = 'Scale')
-        object_context.add_cascade(label='Clear',menu=clear_menu)
-        object_context.add_separator()
-        #Misc
-        object_context.add_command(label = 'Properties')
-        object_context.add_command(label = 'Duplicate')
-        object_context.add_command(label = 'Delete')
-        return object_context
 if __name__=='__main__':
     app = main(tkinter.Tk())
     app.mainloop()
