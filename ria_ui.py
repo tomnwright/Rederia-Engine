@@ -3,18 +3,19 @@ import tkinter
 class ObjectList(tkinter.Frame):
     def __init__(self,master,bg_color='pink',index=0,**kwargs):
         super().__init__(master,**kwargs)
-        
-        self.init_bindtags()
+    
         #Component widgets should be mastered by self not self.master (!!)
         self.master = master
         self.bg_color = bg_color
         #tell frame to not let chilren control size
         #self.pack_propagate(0)
         self.symbols = (
+            tkinter.PhotoImage(file = 'graphics/symbols/axis.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/cube.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/cylinder.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/graph.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/plane.png'),
+            tkinter.PhotoImage(file = 'graphics/symbols/point.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/sphere_ico.png'),
             tkinter.PhotoImage(file = 'graphics/symbols/sphere_uv.png'),
             tkinter.PhotoImage(file = 'graphics/delete.png'),
@@ -64,7 +65,7 @@ class ObjectList(tkinter.Frame):
         self.name.pack(side = 'left')
         
         text_container.pack(side = 'left', fill = 'both', expand=1)
-        
+
     def rename(self, event):
         widget = event.widget.master
         entry_widget = tkinter.Entry(
@@ -92,13 +93,7 @@ class ObjectList(tkinter.Frame):
     def rename_cancel(self, event):
         entry = event.widget
         entry.destroy()
-    def init_bindtags(self):
-        # get the current bind tags
-        bindtags = list(self.bindtags())
-        # add our custom bind tag
-        bindtags.insert(0, "ObjectList")
-        # save the bind tags back to the widget
-        self.bindtags(tuple(bindtags))
+
 if __name__ == '__main__':
     app = tkinter.Tk()
     obj = ObjectList(app,height=50)

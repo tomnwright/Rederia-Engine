@@ -12,19 +12,21 @@ class main(tkinter.Frame):
         
         self.init_win()
         self.init_menubar(self.master)
+        
     def init_right(self,right):
         #currently called from self.init_win
-
-        obj1 = ObjectList(right,bg_color='#232323')
-        obj1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
         obj2 = ObjectList(right,bg_color='#232323',index = 4)
         obj2.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
-
+        obj2.symb.config(bg = 'orange')
+        for i in range(25):
+            obj = ObjectList(right,bg_color='#232323')
+            obj.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        print(obj2.winfo_height())
         #add button
         btn1 = tkinter.Menubutton(
             right,
             text='Add Object',
-            height = obj1.winfo_height())
+            height = obj2.winfo_height())
         a_men = self.init_addmenu(btn1)
         btn1['menu'] = a_men
         btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
@@ -41,9 +43,7 @@ class main(tkinter.Frame):
         panes.add(left,minsize=250)
         right = tkinter.Frame(
             panes,
-            bg='red',
-            padx=obj_pad,
-            pady=obj_pad)
+            bg='red',)
         panes.add(right,minsize=250)
 
         self.init_right(right)
