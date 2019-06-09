@@ -11,11 +11,16 @@ class main(tkinter.Frame):
         self.master = master
         
         self.init_win()
-        self.init_menu(self.master)
+        self.init_menubar(self.master)
     def init_right(self,right):
         #currently called from self.init_win
-        obj1 = ObjectList(right,bg_color='gray')
+
+        obj1 = ObjectList(right,bg_color='#232323')
         obj1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        obj2 = ObjectList(right,bg_color='#232323',index = 4)
+        obj2.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+
+        #add button
         btn1 = tkinter.Menubutton(
             right,
             text='Add Object',
@@ -23,6 +28,8 @@ class main(tkinter.Frame):
         a_men = self.init_addmenu(btn1)
         btn1['menu'] = a_men
         btn1.pack(side = 'top',fill='both',padx=obj_pad,pady=obj_pad)
+        #right.bind_class('ObjectList','<Button-3>',self.objmenu_pop)
+        right.bind_all('<Button-3>',self.objmenu_pop)
     def init_win(self):
 
         self.master.iconbitmap("graphics/icon/icon_03.ico")
@@ -43,7 +50,7 @@ class main(tkinter.Frame):
 
         self.init_right(right)
         #add button on right
-    def init_menu(self,root):
+    def init_menubar(self,root):
 
         menubar = tkinter.Menu(root)
 
@@ -72,7 +79,37 @@ class main(tkinter.Frame):
         view_menu.add_checkbutton(label = 'Grid')
         menubar.add_cascade(label = 'View', menu=view_menu)
 
-        object_menu = tkinter.Menu(menubar,tearoff=1)
+        object_menu = self.init_objmenu(menubar)
+        menubar.add_cascade(label = 'Object', menu=object_menu)
+
+        menubar.add_separator()
+        menubar.add_command(label = 'Render Image')
+
+        root.config(menu=menubar)
+    def init_addmenu(self,root):
+        add_menu = tkinter.Menu(root,tearoff=0)
+        add_menu.add_command(label = 'Camera')
+        #lights
+        light_menu = tkinter.Menu(add_menu, tearoff=0)
+        light_menu.add_command(label = 'Point')
+        light_menu.add_command(label = 'Directional')
+        add_menu.add_cascade(label = 'Light',menu =light_menu)
+        add_menu.add_separator()
+
+        add_menu.add_command(label = 'Plane')
+        add_menu.add_command(label = 'Cube')
+        add_menu.add_command(label = 'UV Sphere')
+        add_menu.add_command(label = 'Ico Sphere')
+        add_menu.add_separator()
+        add_menu.add_command(label = 'Graph')
+        return add_menu
+    def objmenu_pop(self,event):
+        print('pop')
+        print(event.widget.bindtags())
+        context = self.init_objcontext()
+        context.tk_popup(event.x_root, event.y_root, 0)
+    def init_objmenu(self,root):
+        object_menu = tkinter.Menu(root,tearoff=0)
         #Translation
         object_menu.add_command(label = 'Transform')
         #Clear menu
@@ -97,25 +134,24 @@ class main(tkinter.Frame):
         export_menu = tkinter.Menu(object_menu,tearoff=0)
         export_menu.add_command(label = 'Wavefront (OBJ)')
         object_menu.add_cascade(label='Export',menu = export_menu)
-        #~
-        menubar.add_cascade(label = 'Object', menu=object_menu)
-
-        menubar.add_separator()
-        menubar.add_command(label = 'Render Image')
-
-        root.config(menu=menubar)
-    def init_addmenu(self,root):
-        add_menu = tkinter.Menu(root,tearoff=0)
-        add_menu.add_command(label = 'Plane')
-        add_menu.add_command(label = 'Cube')
-        add_menu.add_command(label = 'UV Sphere')
-        add_menu.add_command(label = 'Ico Sphere')
-        add_menu.add_separator()
-        add_menu.add_command(label = 'Graph')
-        return add_menu
-
-
         
+        return object_menu
+    def init_objcontext(self,root=None):
+        object_context = tkinter.Menu(root,tearoff=0)
+        #Translation
+        object_context.add_command(label = 'Transform')
+        #Clear menu
+        clear_menu = tkinter.Menu(object_context,tearoff=0)
+        clear_menu.add_command(label = 'Location')
+        clear_menu.add_command(label = 'Rotation')
+        clear_menu.add_command(label = 'Scale')
+        object_context.add_cascade(label='Clear',menu=clear_menu)
+        object_context.add_separator()
+        #Misc
+        object_context.add_command(label = 'Properties')
+        object_context.add_command(label = 'Duplicate')
+        object_context.add_command(label = 'Delete')
+        return object_context
 if __name__=='__main__':
     app = main(tkinter.Tk())
     app.mainloop()
