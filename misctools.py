@@ -27,6 +27,7 @@ def retag(tag, *args):
 def select(selected,obj):
     if obj not in selected:
         selected.append(obj)
+
 def parse_obj(f_path):
     Vs = []
     Fs = []

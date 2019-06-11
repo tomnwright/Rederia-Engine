@@ -29,11 +29,17 @@ class ObjectFrame(tkinter.Frame):
         self.ppt_btn.pack(side='right',fill='y')
         self.tnf_btn.pack(side='right',fill='y')  
         
+        self.tog = tkinter.Label(
+            self,
+            image = self.symbols.tg1)
+        self.tog.pack(side= 'left', fill='y')
+
         self.symb = tkinter.Label(
             self,
             image = icon,
             bg=Style.colors('grey_01'))
         self.symb.pack(side= 'left', fill='y')
+
         self.text_container = tkinter.Frame(
             self,
             bg = Style.colors('grey_01'))
@@ -87,16 +93,19 @@ class ObjectFrame(tkinter.Frame):
         entry.destroy()
     def set_active(self):
         self.symb.config(bg = Style.colors('active'))
+        self.tog.config(image = self.symbols.tg2)
     def set_selected(self):
         self.symb.config(bg = Style.colors('selected'))
+        self.tog.config(image = self.symbols.tg2)
     def set_deselected(self):
         self.symb.config(bg = Style.colors('grey_01'))
+        self.tog.config(image = self.symbols.tg1)
     def select_passOver(self,event):
         self.obj.toggle_select()
 
 class Style:
-    obj_pad = 5
-
+    obj_pady = 1
+    obj_padx = 5
     @staticmethod
     def colors(index):
         pallete = {'grey_01' : '#232323','active':'#E66A1F','selected':'#E6A882'}
@@ -117,6 +126,9 @@ class Style:
             self.dir = tkinter.PhotoImage(file = 'graphics/symbols/directional.png')
             self.pol = tkinter.PhotoImage(file = 'graphics/symbols/poly.png')
             self.cam = tkinter.PhotoImage(file = 'graphics/symbols/camera.png')
+            self.tg1 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_deselected.png')
+            self.tg2 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_selected.png')
+            self.obj = tkinter.PhotoImage(file = 'graphics/symbols/object.png')
 
     class button:
         @staticmethod
@@ -157,9 +169,8 @@ class add_funcs:
             new_obj,
             icon = master.images.cub)
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def empty(master,obj_container):
@@ -172,9 +183,8 @@ class add_funcs:
             icon = master.images.axi,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
     
     @staticmethod
     def curve(master,obj_container):
@@ -187,9 +197,8 @@ class add_funcs:
             icon = master.images.cur,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def cylinder(master,obj_container):
@@ -202,9 +211,8 @@ class add_funcs:
             icon = master.images.cyl,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def directional(master,obj_container):
@@ -217,9 +225,8 @@ class add_funcs:
             icon = master.images.dir,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def plane(master,obj_container):
@@ -232,9 +239,8 @@ class add_funcs:
             icon = master.images.pla,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def point(master,obj_container):
@@ -247,9 +253,8 @@ class add_funcs:
             icon = master.images.poi,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def poly(master,obj_container):
@@ -262,9 +267,8 @@ class add_funcs:
             icon = master.images.pol,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def ico(master,obj_container):
@@ -277,9 +281,8 @@ class add_funcs:
             icon = master.images.ico,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
     @staticmethod
     def uvs(master,obj_container):
@@ -292,9 +295,8 @@ class add_funcs:
             icon = master.images.uvs,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
     
     @staticmethod
     def camera(master,obj_container):
@@ -307,9 +309,108 @@ class add_funcs:
             icon = master.images.cam,
             **Style.ObjectFrame())
         
-        new_obj.list_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_pad,pady=Style.obj_pad)
-        master.update_scroll(master.obj_canvas)
+        new_obj.frame_instance = obj_frame
+        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
  
+
+class menus:
+    @staticmethod
+    def init_menubar(root):
+
+        menubar = tkinter.Menu(root.master)
+
+        #File menu
+        file_menu = tkinter.Menu(menubar,tearoff=0)
+        #New/open functions
+        file_menu.add_command(label='New',command = lambda: print("File; New"))
+        file_menu.add_command(label='Open',command = lambda: print("File; Open"))
+        file_menu.add_separator()
+        #Save functions
+        file_menu.add_command(label='Save',command = lambda: print("File; Save"))
+        file_menu.add_command(label='Save As',command = lambda: print("File; Save As"))
+        file_menu.add_command(label='Save Copy',command = lambda: print("File; Save Copy"))
+        file_menu.add_separator()
+        #Preferences
+        file_menu.add_command(label='Preferences',command = lambda: print("File; Preferences"))
+        menubar.add_cascade(label = 'File', menu=file_menu)
+
+        edit_menu = tkinter.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label = 'Undo',state='disabled')
+        edit_menu.add_command(label = 'Redo',state='disabled')
+        edit_menu.add_separator()
+        edit_menu.add_command(label = 'Select All', command = root.handler.select_all)
+        menubar.add_cascade(label = 'Edit', menu=edit_menu)
+
+        view_menu = tkinter.Menu(menubar, tearoff=0)
+        view_menu.add_checkbutton(label = 'Axis')
+        view_menu.add_checkbutton(label = 'Grid')
+        menubar.add_cascade(label = 'View', menu=view_menu)
+
+        object_menu = menus.init_objmenu(menubar,root)
+        menubar.add_cascade(label = 'Object', menu=object_menu)
+
+        debug_menu = menus.init_debugmenu(menubar,root)
+        menubar.add_cascade(label='Debug',menu=debug_menu)
+
+        menubar.add_separator()
+        menubar.add_command(label = 'Render Image')
+
+        root.master.config(menu=menubar)
+    @staticmethod
+    def init_objmenu(parent,root):
+        object_menu = tkinter.Menu(parent,tearoff=0)
+        #Translation
+        object_menu.add_command(label = 'Transform',state='disabled')
+        #Clear menu
+        clear_menu = tkinter.Menu(object_menu,tearoff=0)
+        clear_menu.add_command(label = 'Location')
+        clear_menu.add_command(label = 'Rotation')
+        clear_menu.add_command(label = 'Scale')
+        object_menu.add_cascade(label='Clear',menu=clear_menu,state='disabled')
+        object_menu.add_separator()
+        #Misc
+        object_menu.add_command(label = 'Properties',command = root.properties_temp)
+        object_menu.add_command(label = 'Duplicate',state='disabled')
+        object_menu.add_command(label = 'Delete', command = root.handler.delete_selection)
+        object_menu.add_separator()
+        #New section
+        object_menu.add_cascade(label = 'Add',menu = menus.init_addmenu(object_menu,root))
+        #Import
+        import_menu = tkinter.Menu(object_menu,tearoff=0)
+        import_menu.add_command(label = 'Wavefront (OBJ)',command = lambda: add_funcs.poly(root,root.obj_frame))
+        object_menu.add_cascade(label='Import',menu = import_menu)
+        #Export
+        export_menu = tkinter.Menu(object_menu,tearoff=0)
+        export_menu.add_command(label = 'Wavefront (OBJ)')
+        object_menu.add_cascade(label='Export',menu = export_menu)
+        
+        return object_menu
+    @staticmethod
+    def init_addmenu(parent,root):
+        add_menu = tkinter.Menu(parent,tearoff=0)
+        add_menu.add_command(label = 'Camera',command = lambda: add_funcs.camera(root,root.obj_frame))
+        #lights
+        light_menu = tkinter.Menu(add_menu, tearoff=0)
+        light_menu.add_command(label = 'Point',command = lambda: add_funcs.point(root,root.obj_frame))
+        light_menu.add_command(label = 'Directional',command = lambda: add_funcs.directional(root,root.obj_frame))
+        add_menu.add_cascade(label = 'Light',menu =light_menu)
+        add_menu.add_command(label = 'Plain Axis',command = lambda: add_funcs.empty(root,root.obj_frame))
+        add_menu.add_separator()
+
+        add_menu.add_command(label = 'Plane',command = lambda: add_funcs.plane(root,root.obj_frame))
+        add_menu.add_command(label = 'Cube',command = lambda: add_funcs.cube(root,root.obj_frame))
+        add_menu.add_command(label = 'UV Sphere',command = lambda: add_funcs.uvs(root,root.obj_frame))
+        add_menu.add_command(label = 'Ico Sphere',command = lambda: add_funcs.ico(root,root.obj_frame))
+        add_menu.add_command(label = 'Cylinder',command = lambda: add_funcs.cylinder(root,root.obj_frame))
+        add_menu.add_separator()
+        add_menu.add_command(label = 'Curve',command = lambda: add_funcs.curve(root,root.obj_frame))
+        return add_menu
+    @staticmethod
+    def init_debugmenu(parent,root):
+        debug = tkinter.Menu(parent,tearoff=0)
+        debug.add_command(label='List objects', command = root.handler.ls_objs)
+        debug.add_command(label='List selected', command = root.handler.debug_selection)
+        return debug
+
 if __name__ == '__main__':
     pass

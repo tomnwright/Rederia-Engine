@@ -22,10 +22,13 @@ class Vector3:
     def vector_scale(self, vA):
         nx,ny,nz = vA * self.x , vA * self.y, vA * self.z
         return Vector3(nx,ny,nz)
-
+    @staticmethod
+    def unit():
+        return Vector3(1,1,1)
+    @staticmethod
+    def zero():
+        return Vector3()
     __rmul__ = __mul__
-Vector3.unit = Vector3(1,1,1)
-Vector3.zero = Vector3()
 
 class Vector2:
     def __init__(self,x=0,y=0):
@@ -43,9 +46,13 @@ class Vector2:
         return Vector2(
             self.x*sA,
             self.y*sA)
+    @staticmethod
+    def unit():
+        return Vector2(1,1)
+    @staticmethod
+    def zero():
+        return Vector2()
     __rmul__ = __mul__
-Vector2.unit = Vector2(1,1)
-Vector2.zero = Vector2()
 
 class Object3D:
     def __init__(
@@ -55,14 +62,14 @@ class Object3D:
         location = Vector3.zero,
         rotation = Vector3.zero,
         size = Vector3.unit,
-        list_instance = None):
+        frame_instance = None):
         #___________________
         self.master = master
         self.set_name(name)
         self.location = location
         self.rotation = rotation
         self.size = size
-        self.list_instance = list_instance
+        self.frame_instance = frame_instance
     def translate(self):#, tA):
         #self.location += tA
         print('{} will be translated'.format(self.name))
@@ -79,25 +86,26 @@ class Object3D:
         self.name = new_name
         return self.name
     def delete(self):
-        self.list_instance.destroy()
+        self.frame_instance.destroy()
         if self in self.master.selected:
             self.master.selected.remove(self)
             if self.master.active is self:
                 self.master.active = None
-        self.master.remove_object(self)
+        self.master.objects.remove(self)
     def toggle_select(self):
         if self.master.active == self:
             self.master.active = None
             self.master.selected.remove(self)
-            self.list_instance.set_deselected()
+            self.frame_instance.set_deselected()
         else:
             ria.misctools.select(self.master.selected,self)
-            self.list_instance.set_active()
+            self.frame_instance.set_active()
             if self.master.active:
-                self.master.active.list_instance.set_selected()
+                self.master.active.frame_instance.set_selected()
             self.master.active = self
     def properties_temp(self):
         print("___OBJ___\nName : {}\nType : {}\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.name,type(self),self.location,self.rotation,self.size))
+
 class MeshObject(Object3D):
     #restructure to include mesh
     def __init__(self,*args,mesh,**kwargs):
@@ -117,8 +125,6 @@ class Mesh:
             gVs.append(n)
         return gVs
 
-
-
 class ObjectMaster:
     def __init__(self):
         self.objects = []
@@ -127,14 +133,30 @@ class ObjectMaster:
     def add_object(self, new_obj):
         self.objects.append(new_obj)
         return new_obj
-    def remove_object(self,object_instance):
-        self.objects.remove(object_instance)
     def ls_objs(self):
         print([i.name for i in self.objects])
     def debug_selection(self):
         print('Active: {}\n Selected: {}\n'.format(self.active,[i.name for i in self.selected]))
+    def delete_selection(self):
+        while self.selected:
+            target = self.selected.pop(0)
+            #note that Object3D.delete() removes ITSELF from [selected] and from [active]
+            target.delete()
+        self.selected = []
+        self.active = None
 
 
+    def select_all(self):
+        if self.selected:
+            for i in self.selected:
+                i.frame_instance.set_deselected()
+            self.selected = []
+            self.active = None
+        else:
+            for i in self.objects:
+                self.selected.append(i)
+                i.frame_instance.set_selected()
+            
 from ria_objs import *
 if __name__ == '__main__':
     handlers = []
