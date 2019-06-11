@@ -129,7 +129,21 @@ class Style:
             self.tg1 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_deselected.png')
             self.tg2 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_selected.png')
             self.obj = tkinter.PhotoImage(file = 'graphics/symbols/object.png')
-
+        def get_by_class(self,obj_class):
+            class_to_img = {
+                ria.Empty : self.axi,
+                ria.Cube : self.cub,
+                ria.Cylinder : self.cyl,
+                ria.Curve : self.cur,
+                ria.Plane : self.pla,
+                ria.Point : self.poi,
+                ria.Icosphere : self.ico,
+                ria.Sphere : self.uvs,
+                ria.Directional : self.dir,
+                ria.Poly : self.pol,
+                ria.Camera : self.cam,
+            }
+            return class_to_img[obj_class]
     class button:
         @staticmethod
         def delete(img_ls):
@@ -160,158 +174,16 @@ class Style:
 
 class add_funcs:
     @staticmethod
-    def cube(master,obj_container):
-        new_obj = ria.Cube(master.handler,'Cube')
+    def generic(master,obj_container,obj_type):
+        new_obj = obj_type(master.handler)
         master.handler.add_object(new_obj)
-
         obj_frame = ObjectFrame(
             obj_container,
             new_obj,
-            icon = master.images.cub)
-        
+            icon = master.images.get_by_class(obj_type)
+        )
         new_obj.frame_instance = obj_frame
         obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def empty(master,obj_container):
-        new_obj = ria.Empty(master.handler,'Empty')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.axi,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
-    
-    @staticmethod
-    def curve(master,obj_container):
-        new_obj = ria.Curve(master.handler,'Curve')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.cur,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def cylinder(master,obj_container):
-        new_obj = ria.Cylinder(master.handler,'Cylinder')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.cyl,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def directional(master,obj_container):
-        new_obj = ria.Directional(master.handler,'Directional')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.dir,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def plane(master,obj_container):
-        new_obj = ria.Plane(master.handler,'Plane')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.pla,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def point(master,obj_container):
-        new_obj = ria.Point(master.handler,'Point')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.poi,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def poly(master,obj_container):
-        new_obj = ria.Poly(master.handler,'Poly')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.pol,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def ico(master,obj_container):
-        new_obj = ria.Icosphere(master.handler,'Icosphere')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.ico,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
-    @staticmethod
-    def uvs(master,obj_container):
-        new_obj = ria.Sphere(master.handler,'Sphere')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.uvs,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
-    
-    @staticmethod
-    def camera(master,obj_container):
-        new_obj = ria.Camera(master.handler,'Camera')
-        master.handler.add_object(new_obj)
-
-        obj_frame = ObjectFrame(
-            obj_container,
-            new_obj,
-            icon = master.images.cam,
-            **Style.ObjectFrame())
-        
-        new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
- 
 
 class menus:
     @staticmethod
@@ -377,7 +249,7 @@ class menus:
         object_menu.add_cascade(label = 'Add',menu = menus.init_addmenu(object_menu,root))
         #Import
         import_menu = tkinter.Menu(object_menu,tearoff=0)
-        import_menu.add_command(label = 'Wavefront (OBJ)',command = lambda: add_funcs.poly(root,root.obj_frame))
+        import_menu.add_command(label = 'Wavefront (OBJ)',command = lambda: add_funcs.generic(root,root.obj_frame,ria.Poly))
         object_menu.add_cascade(label='Import',menu = import_menu)
         #Export
         export_menu = tkinter.Menu(object_menu,tearoff=0)
@@ -388,22 +260,22 @@ class menus:
     @staticmethod
     def init_addmenu(parent,root):
         add_menu = tkinter.Menu(parent,tearoff=0)
-        add_menu.add_command(label = 'Camera',command = lambda: add_funcs.camera(root,root.obj_frame))
+        add_menu.add_command(label = 'Camera',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Camera))
         #lights
         light_menu = tkinter.Menu(add_menu, tearoff=0)
-        light_menu.add_command(label = 'Point',command = lambda: add_funcs.point(root,root.obj_frame))
-        light_menu.add_command(label = 'Directional',command = lambda: add_funcs.directional(root,root.obj_frame))
+        light_menu.add_command(label = 'Point',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Point))
+        light_menu.add_command(label = 'Directional',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Directional))
         add_menu.add_cascade(label = 'Light',menu =light_menu)
-        add_menu.add_command(label = 'Plain Axis',command = lambda: add_funcs.empty(root,root.obj_frame))
+        add_menu.add_command(label = 'Plain Axis',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Empty))
         add_menu.add_separator()
 
-        add_menu.add_command(label = 'Plane',command = lambda: add_funcs.plane(root,root.obj_frame))
-        add_menu.add_command(label = 'Cube',command = lambda: add_funcs.cube(root,root.obj_frame))
-        add_menu.add_command(label = 'UV Sphere',command = lambda: add_funcs.uvs(root,root.obj_frame))
-        add_menu.add_command(label = 'Ico Sphere',command = lambda: add_funcs.ico(root,root.obj_frame))
-        add_menu.add_command(label = 'Cylinder',command = lambda: add_funcs.cylinder(root,root.obj_frame))
+        add_menu.add_command(label = 'Plane',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Plane))
+        add_menu.add_command(label = 'Cube',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Cube))
+        add_menu.add_command(label = 'UV Sphere',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Sphere))
+        add_menu.add_command(label = 'Ico Sphere',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Icosphere))
+        add_menu.add_command(label = 'Cylinder',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Cylinder))
         add_menu.add_separator()
-        add_menu.add_command(label = 'Curve',command = lambda: add_funcs.curve(root,root.obj_frame))
+        add_menu.add_command(label = 'Curve',command = lambda: add_funcs.generic(root,root.obj_frame,ria.Curve))
         return add_menu
     @staticmethod
     def init_debugmenu(parent,root):

@@ -70,7 +70,7 @@ class main(tkinter.Frame):
             self.handler.active.properties_temp()
 
             props_win = win_properties.main(tkinter.Toplevel())
-            props_win.grab_set()
+            #props_win.grab_set()
             props_win.mainloop()
         else:
             messagebox.showerror('No Active Object','should this error happen...')

@@ -30,6 +30,7 @@ class main(tkinter.Frame):
         super().__init__(master)
         self.master = master
         self.master.config(bg = 'gray')
+        self.master.grab_set()
         self.imgs = Style.images()
 
         self.notebook = ttk.Notebook(self.master)
@@ -53,7 +54,7 @@ class main(tkinter.Frame):
         z_label.pack(side = 'left')
         z.pack(side = 'top',fill='both', padx = 2, pady=2)
 
-        loc.pack(fill='both',padx=5,pady=5)
+        loc.pack(fill='both',padx=5,pady=5,expand=1)
         
         rot = tkinter.LabelFrame(self.f1,text='Rotation',padx =2,pady=2)
         x = tkinter.Label(rot,text='12.5000',bg = 'black',fg='white',anchor = 'e')
@@ -71,7 +72,7 @@ class main(tkinter.Frame):
         z_label.pack(side = 'left')
         z.pack(side = 'top',fill='both', padx = 2, pady=2)
 
-        rot.pack(fill='both',padx=5,pady=5)
+        rot.pack(fill='both',padx=5,pady=5,expand=1)
         
         scale = tkinter.LabelFrame(self.f1,text='Scale',padx =2,pady=2)
         x = tkinter.Label(scale,text='12.5000',bg = 'black',fg='white',anchor = 'e')
@@ -89,7 +90,7 @@ class main(tkinter.Frame):
         z_label.pack(side = 'left')
         z.pack(side = 'top',fill='both', padx = 2, pady=2)
 
-        scale.pack(fill='both',padx=5,pady=5)
+        scale.pack(fill='both',padx=5,pady=5,expand=1)
 
 
 
@@ -108,5 +109,5 @@ class main(tkinter.Frame):
 
 
 if __name__ == '__main__':
-    top = main(tkinter.Tk())
+    top = main(tkinter.Toplevel())
     top.mainloop()
