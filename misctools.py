@@ -27,6 +27,34 @@ def retag(tag, *args):
 def select(selected,obj):
     if obj not in selected:
         selected.append(obj)
+def get_intDisplay(value, figures):
+    value, figures = list(str(float(value))), int(figures)
+
+    point_pos = value.index('.')
+    del value[point_pos]
+    
+    new = []
+
+    for e,i in enumerate(value):
+        if e<figures:
+            new.append(i)
+        elif e == figures:
+            new.append(i)
+            new_round = round(int(''.join(new)),-1)
+            new = list(str(new_round))[:-1]
+        elif e<=point_pos:
+            new.append('0')
+
+    add_0 = '0'*(figures-len(new))
+    if add_0:
+        new.append(add_0)
+    
+    if point_pos < len(new):
+        new.insert(point_pos, '.')
+    return ''.join(new)
+
+
+
 
 def parse_obj(f_path):
     Vs = []
@@ -47,5 +75,7 @@ def parse_obj(f_path):
                 Fs.append(face)
     return Vs, Fs
 if __name__ == '__main__':
-    v,f = parse_obj('tests/unit_plane.obj')
-    print([str(i) for i in v], f)
+    #v,f = parse_obj('tests/unit_plane.obj')
+    #print([str(i) for i in v], f)
+    for i in range(10):
+        print(get_intDisplay(1969123.723097,i))

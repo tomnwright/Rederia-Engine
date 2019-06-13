@@ -6,6 +6,7 @@ class ObjectFrame(tkinter.Frame):
     
         #Component widgets should be mastered by self not self.master (!!)
         self.master = master
+        self.config(background = Style.colors('grey_01'))
         #linked to actual object
         self.obj = obj3d
         #tell frame to not let chilren control size
@@ -16,18 +17,21 @@ class ObjectFrame(tkinter.Frame):
         self.del_btn = tkinter.Button(
             self,
             command = self.obj.delete,
-            **Style.button.delete(self.symbols))
+            **Style.button.delete(self.symbols),
+            activebackground = 'orange'
+            )
         self.tnf_btn = tkinter.Button(
             self,
+            command = lambda: self.obj.master.transform_objects([self.obj,]),
             **Style.button.transform(self.symbols))
         self.ppt_btn = tkinter.Button(
             self,
             command = self.obj.properties_temp,
             **Style.button.properties(self.symbols))
         #packing buttons
-        self.del_btn.pack(side='right',fill='y')
-        self.ppt_btn.pack(side='right',fill='y')
-        self.tnf_btn.pack(side='right',fill='y')  
+        self.del_btn.pack(side='right',fill='y',padx=(2,4,),pady=4)
+        self.ppt_btn.pack(side='right',fill='y',padx=2,pady=4)
+        self.tnf_btn.pack(side='right',fill='y',padx=(4,2,),pady=4)  
         
         self.tog = tkinter.Label(
             self,
@@ -37,7 +41,8 @@ class ObjectFrame(tkinter.Frame):
         self.symb = tkinter.Label(
             self,
             image = icon,
-            bg=Style.colors('grey_01'))
+            bg=Style.colors('grey_01')
+            )
         self.symb.pack(side= 'left', fill='y')
 
         self.text_container = tkinter.Frame(
@@ -102,7 +107,84 @@ class ObjectFrame(tkinter.Frame):
         self.tog.config(image = self.symbols.tg1)
     def select_passOver(self,event):
         self.obj.toggle_select()
+class Vector3_ui:
+    class DisplayFrame(tkinter.LabelFrame):
+        def __init__(self,master, *args, x=0, y=0, z=0,**kwargs):
+            super().__init__(master, *args,**kwargs, padx = 2, pady=2)
+            
+            self.x = Vector3_ui.ValueDisplay(self, 'X:',x)
+            self.x.pack(fill='both',padx = 2, pady=2)
 
+            self.y = Vector3_ui.ValueDisplay(self, 'Y:',y)
+            self.y.pack(fill='both',padx = 2, pady=2)
+
+            self.z = Vector3_ui.ValueDisplay(self, 'Z:',z)
+            self.z.pack(fill='both',padx = 2, pady=2)
+
+        def get_x(self):
+            return float(self.x.value)
+        def get_y(self):
+            return float(self.y.value)
+        def get_z(self):
+            return float(self.z.value)
+        def get_v3(self):
+            return ria.Vector3(
+                x = self.get_x(),
+                y = self.get_y(),
+                z = self.get_z())
+    class ValueDisplay(tkinter.Label):
+        def __init__(self, master,  label, value, *args, **kwargs):
+            self.value = ria.misctools.get_intDisplay(value,6)
+            super().__init__(
+                master,
+                text=self.value,
+                bg = 'black',fg='white',
+                anchor = 'e',
+                padx = 0, pady = 0
+                )
+
+            x_label = tkinter.Label(self,text=label,bg = 'black',fg='white',anchor = 'w')
+            x_label.pack(side = 'left')
+
+            self.bind('<Button-1>',self.edit_init)
+
+        def edit_init(self, event):
+            widget = event.widget
+            entry_widget = tkinter.Entry(
+                widget,
+                bg = 'gray',
+                selectbackground = Style.colors('grey_01'),
+                relief = 'flat',
+                fg = 'white',
+                #insertbackground = 'lightblue'
+                justify = 'right',
+                )
+
+            entry_widget.insert(0,self.value)
+            entry_widget.select_range(0, 'end')
+            entry_widget.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0)
+            entry_widget.bind("<Return>", self.edit_lock)
+            entry_widget.bind("<Escape>", self.edit_cancel)
+            entry_widget.bind("<FocusOut>", self.edit_lock)
+            entry_widget.focus_set()
+
+        def edit_lock(self, event):
+            entry = event.widget
+            i = entry.get()
+        
+            if i and i != self.value:
+                self.value = ria.misctools.get_intDisplay(eval(i),6)
+                self.configure(text=self.value)
+
+            entry.destroy()
+        def edit_cancel(self, event):
+            entry = event.widget
+            entry.destroy()
+class LabeledWidget:
+    class Label(tkinter.Label):
+        def __init__(self,label,*args,**kwargs):
+            super().__init__(*args,**kwargs)
+            self.label = label
 class Style:
     obj_pady = 1
     obj_padx = 5
@@ -129,6 +211,10 @@ class Style:
             self.tg1 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_deselected.png')
             self.tg2 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_selected.png')
             self.obj = tkinter.PhotoImage(file = 'graphics/symbols/object.png')
+
+            self.translate = tkinter.PhotoImage(file = 'graphics/transformations/translate.png')
+            self.rotate = tkinter.PhotoImage(file = 'graphics/transformations/rotate.png')
+            self.scale = tkinter.PhotoImage(file = 'graphics/transformations/scale.png')
         def get_by_class(self,obj_class):
             class_to_img = {
                 ria.Empty : self.axi,
@@ -232,7 +318,7 @@ class menus:
     def init_objmenu(parent,root):
         object_menu = tkinter.Menu(parent,tearoff=0)
         #Translation
-        object_menu.add_command(label = 'Transform',state='disabled')
+        object_menu.add_command(label = 'Transform',command = lambda: root.handler.transform_objects(root.handler.selected))
         #Clear menu
         clear_menu = tkinter.Menu(object_menu,tearoff=0)
         clear_menu.add_command(label = 'Location')
@@ -285,4 +371,8 @@ class menus:
         return debug
 
 if __name__ == '__main__':
-    pass
+    root = tkinter.Tk()
+    x = Vector3_ui.DisplayFrame(root, text = 'Location', x=1,y = 3, z = 4)
+    x.pack(fill='both')
+    root.mainloop()
+    

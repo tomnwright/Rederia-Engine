@@ -1,4 +1,5 @@
-import misctools
+import misctools,tkinter
+import win_transform
 
 class Vector3:
     def __init__(self,x=0,y=0,z=0):
@@ -13,12 +14,17 @@ class Vector3:
             self.y+vA.y,
             self.z+vA.z)
     def __mul__(self,sA):
-        if type(sA) not in (float,str,):
+        if type(sA) in (float,str,):
             raise Exception('Affector must be scalar')
         return Vector3(
             self.x*sA,
             self.y*sA,
             self.z*sA)
+    def straight_product(self,vA):
+        return Vector3(
+            self.x*vA.z,
+            self.y*vA.y,
+            self.z*vA.z)
     def vector_scale(self, vA):
         nx,ny,nz = vA * self.x , vA * self.y, vA * self.z
         return Vector3(nx,ny,nz)
@@ -59,9 +65,9 @@ class Object3D:
         self,
         master,
         name,
-        location = Vector3.zero,
-        rotation = Vector3.zero,
-        size = Vector3.unit,
+        location = Vector3.zero(),
+        rotation = Vector3.zero(),
+        size = Vector3.unit(),
         frame_instance = None):
         #___________________
         self.master = master
@@ -70,15 +76,12 @@ class Object3D:
         self.rotation = rotation
         self.size = size
         self.frame_instance = frame_instance
-    def translate(self):#, tA):
-        #self.location += tA
-        print('{} will be translated'.format(self.name))
-    def rotate(self):#, rA):
-        #self.rotation += rA
-        print('{} will be rotated'.format(self.name))
-    def scale(self):#,sA):
-        #self.size *= sA
-        print('{} will be scaled'.format(self.name))
+    def translate(self, tA):
+        self.location += tA
+    def rotate(self, rA):
+        self.rotation += rA
+    def scale(self,sA):
+        self.size = self.size.straight_product(sA)
     def set_name(self,new_name):
         names = [i.name for i in self.master.objects]
         while new_name in names:
@@ -105,6 +108,7 @@ class Object3D:
             self.master.active = self
     def properties_temp(self):
         print("___OBJ___\nName : {}\nType : {}\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.name,type(self),self.location,self.rotation,self.size))
+    
 
 class MeshObject(Object3D):
     #restructure to include mesh
@@ -156,7 +160,9 @@ class ObjectMaster:
             for i in self.objects:
                 self.selected.append(i)
                 i.frame_instance.set_selected()
-            
+    def transform_objects(self,obj_list):
+        trans_win = win_transform.main(tkinter.Toplevel(),obj_list)
+        trans_win.mainloop()
 from ria_objs import *
 if __name__ == '__main__':
     handlers = []
