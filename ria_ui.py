@@ -1,4 +1,4 @@
-import tkinter,ria
+import tkinter,ria,string
 
 class ObjectFrame(tkinter.Frame):
     def __init__(self,master,obj3d,icon,**kwargs):
@@ -6,7 +6,7 @@ class ObjectFrame(tkinter.Frame):
     
         #Component widgets should be mastered by self not self.master (!!)
         self.master = master
-        self.config(background = Style.colors('grey_01'))
+        self.config(background = Style.colour.bw[0])
         #linked to actual object
         self.obj = obj3d
         #tell frame to not let chilren control size
@@ -18,7 +18,6 @@ class ObjectFrame(tkinter.Frame):
             self,
             command = self.obj.delete,
             **Style.button.delete(self.symbols),
-            activebackground = 'orange'
             )
         self.tnf_btn = tkinter.Button(
             self,
@@ -35,23 +34,24 @@ class ObjectFrame(tkinter.Frame):
         
         self.tog = tkinter.Label(
             self,
-            image = self.symbols.tg1)
+            image = self.symbols.tg1,
+            bg=Style.colour.bw[1])
         self.tog.pack(side= 'left', fill='y')
 
         self.symb = tkinter.Label(
             self,
             image = icon,
-            bg=Style.colors('grey_01')
+            bg=Style.colour.bw[0]
             )
         self.symb.pack(side= 'left', fill='y')
 
         self.text_container = tkinter.Frame(
             self,
-            bg = Style.colors('grey_01'))
+            bg = Style.colour.bw[0])
         
         self.name = tkinter.Label(
             self.text_container,
-            background = Style.colors('grey_01'),
+            background = Style.colour.bw[0],
             text=self.obj.name,
             justify='left' ,
             padx = 1 ,
@@ -71,7 +71,7 @@ class ObjectFrame(tkinter.Frame):
         entry_widget = tkinter.Entry(
             widget,
             bg = 'gray',
-            selectbackground = Style.colors('grey_01'),
+            selectbackground = Style.colour.bw[0],
             relief = 'flat',
             fg = 'white',
             #insertbackground = 'lightblue'
@@ -97,20 +97,23 @@ class ObjectFrame(tkinter.Frame):
         entry = event.widget
         entry.destroy()
     def set_active(self):
-        self.symb.config(bg = Style.colors('active'))
+        self.symb.config(bg = Style.colour.orange[0])
         self.tog.config(image = self.symbols.tg2)
     def set_selected(self):
-        self.symb.config(bg = Style.colors('selected'))
+        self.symb.config(bg = Style.colour.orange[1])
         self.tog.config(image = self.symbols.tg2)
     def set_deselected(self):
-        self.symb.config(bg = Style.colors('grey_01'))
+        self.symb.config(bg = Style.colour.bw[0])
         self.tog.config(image = self.symbols.tg1)
     def select_passOver(self,event):
         self.obj.toggle_select()
 class Vector3_ui:
     class DisplayFrame(tkinter.LabelFrame):
         def __init__(self,master, *args, x=0, y=0, z=0,**kwargs):
-            super().__init__(master, *args,**kwargs, padx = 2, pady=2)
+            super().__init__(master, *args,**kwargs,
+                bg = Style.colour.bw[0],
+                fg = 'white',
+                padx = 2, pady=2)
             
             self.x = Vector3_ui.ValueDisplay(self, 'X:',x)
             self.x.pack(fill='both',padx = 2, pady=2)
@@ -138,12 +141,17 @@ class Vector3_ui:
             super().__init__(
                 master,
                 text=self.value,
-                bg = 'black',fg='white',
+                bg = Style.colour.bw[1],fg='white',
                 anchor = 'e',
                 padx = 0, pady = 0
                 )
 
-            x_label = tkinter.Label(self,text=label,bg = 'black',fg='white',anchor = 'w')
+            x_label = tkinter.Label(self,
+                text=label,
+                bg = Style.colour.bw[1],
+                fg='white',
+                anchor = 'w'
+                )
             x_label.pack(side = 'left')
 
             self.bind('<Button-1>',self.edit_init)
@@ -153,7 +161,7 @@ class Vector3_ui:
             entry_widget = tkinter.Entry(
                 widget,
                 bg = 'gray',
-                selectbackground = Style.colors('grey_01'),
+                selectbackground = Style.colour.bw[0],
                 relief = 'flat',
                 fg = 'white',
                 #insertbackground = 'lightblue'
@@ -171,12 +179,17 @@ class Vector3_ui:
         def edit_lock(self, event):
             entry = event.widget
             i = entry.get()
-        
-            if i and i != self.value:
-                self.value = ria.misctools.get_intDisplay(eval(i),6)
-                self.configure(text=self.value)
+            try:
+                if i and i != self.value:
+                    if ria.misctools.contains_except(i, '01234567.'):
+                        i = eval(i)
+                    self.value = ria.misctools.get_intDisplay(i,6)
+                    self.configure(text=self.value)
 
-            entry.destroy()
+                entry.destroy()
+            except Exception as e:
+                print(e)
+                entry.destroy()
         def edit_cancel(self, event):
             entry = event.widget
             entry.destroy()
@@ -186,12 +199,27 @@ class LabeledWidget:
             super().__init__(*args,**kwargs)
             self.label = label
 class Style:
-    obj_pady = 1
-    obj_padx = 5
-    @staticmethod
-    def colors(index):
-        pallete = {'grey_01' : '#232323','active':'#E66A1F','selected':'#E6A882'}
-        return pallete[index]
+    class colour:
+        bw = ['#232323',
+            '#404040',
+            '#575757',
+            '#656565',
+            '#7e7e7e',
+            '#a0a0a0',
+            '#bcbcbc',
+            '#cacaca',
+            '#e5e5e5',
+            '#ffffff',
+            ]     
+        orange = ['#ff7200',
+            '#ff9c4d',
+            '#dd6a0c']
+
+        delete_button = [
+            '#8b0000',
+            '#bf1313'
+            ]
+
     class images:
         def __init__(self):
             self.axi = tkinter.PhotoImage(file = 'graphics/symbols/axis.png')
@@ -235,21 +263,24 @@ class Style:
         def delete(img_ls):
             out = {
             'relief' : 'flat',
-            'bg' : 'darkred',
+            'bg' : Style.colour.delete_button[0],
+            'activebackground' : Style.colour.delete_button[1],
             'image' : img_ls.dee}
             return out
         @staticmethod
         def properties(img_ls):
             out = {
                 'relief' : 'flat',
-                'bg' : 'darkgray',
+                'bg' : Style.colour.bw[2],
+                'activebackground' : Style.colour.bw[3],
                 'image' : img_ls.pro}
             return out
         @staticmethod
         def transform(img_ls):
             out = {
                 'relief' : 'flat',
-                'bg' : 'darkgreen',
+                'bg' : Style.colour.orange[2],
+                'activebackground' : Style.colour.orange[1],
                 'image' : img_ls.tra}
             return out
     @staticmethod
@@ -262,6 +293,7 @@ class add_funcs:
     @staticmethod
     def generic(master,obj_container,obj_type):
         new_obj = obj_type(master.handler)
+        
         master.handler.add_object(new_obj)
         obj_frame = ObjectFrame(
             obj_container,
@@ -269,7 +301,7 @@ class add_funcs:
             icon = master.images.get_by_class(obj_type)
         )
         new_obj.frame_instance = obj_frame
-        obj_frame.pack(side = 'top',fill='both',padx=Style.obj_padx,pady=Style.obj_pady)
+        obj_frame.pack(side = 'top',fill='both',padx=(0,5,),pady=2)
 
 class menus:
     @staticmethod

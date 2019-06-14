@@ -52,7 +52,12 @@ def get_intDisplay(value, figures):
     if point_pos < len(new):
         new.insert(point_pos, '.')
     return ''.join(new)
-
+def contains_except(iterable, target_ls):
+    for i in iterable:
+        if i not in target_ls:
+            return True
+    
+    return False
 
 
 
