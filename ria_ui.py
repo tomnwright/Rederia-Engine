@@ -35,7 +35,7 @@ class ObjectFrame(tkinter.Frame):
         self.tog = tkinter.Label(
             self,
             image = self.symbols.tg1,
-            bg=Style.colour.bw[1])
+            bg=Style.colour.bw[2])
         self.tog.pack(side= 'left', fill='y')
 
         self.symb = tkinter.Label(
@@ -107,7 +107,9 @@ class ObjectFrame(tkinter.Frame):
         self.tog.config(image = self.symbols.tg1)
     def select_passOver(self,event):
         self.obj.toggle_select()
-class Vector3_ui:
+    def update(self):
+        self.name.configure(text=self.obj.name)
+class input_ui:
     class DisplayFrame(tkinter.LabelFrame):
         def __init__(self,master, *args, x=0, y=0, z=0,**kwargs):
             super().__init__(master, *args,**kwargs,
@@ -115,13 +117,13 @@ class Vector3_ui:
                 fg = 'white',
                 padx = 2, pady=2)
             
-            self.x = Vector3_ui.ValueDisplay(self, 'X:',x)
+            self.x = input_ui.ValueDisplay(self, 'X:',x)
             self.x.pack(fill='both',padx = 2, pady=2)
 
-            self.y = Vector3_ui.ValueDisplay(self, 'Y:',y)
+            self.y = input_ui.ValueDisplay(self, 'Y:',y)
             self.y.pack(fill='both',padx = 2, pady=2)
 
-            self.z = Vector3_ui.ValueDisplay(self, 'Z:',z)
+            self.z = input_ui.ValueDisplay(self, 'Z:',z)
             self.z.pack(fill='both',padx = 2, pady=2)
 
         def get_x(self):
@@ -139,16 +141,16 @@ class Vector3_ui:
         def __init__(self, master,  label, value, *args, **kwargs):
             self.value = ria.misctools.get_intDisplay(value,6)
             super().__init__(
-                master,
+                master, *args, **kwargs,
                 text=self.value,
-                bg = Style.colour.bw[1],fg='white',
+                bg = Style.colour.bw[2],fg='white',
                 anchor = 'e',
                 padx = 0, pady = 0
                 )
 
             x_label = tkinter.Label(self,
                 text=label,
-                bg = Style.colour.bw[1],
+                bg = Style.colour.bw[2],
                 fg='white',
                 anchor = 'w'
                 )
@@ -193,14 +195,129 @@ class Vector3_ui:
         def edit_cancel(self, event):
             entry = event.widget
             entry.destroy()
+    
+    class GenericDisplay(tkinter.Label):
+        def __init__(self, master,validate = None, *args, **kwargs):
+            super().__init__(
+                master, *args, **kwargs,
+                bg = Style.colour.bw[2],fg='white',
+                )
+            self.validate = validate
+            self.bind('<Button-1>',self.edit_init)
+
+        def edit_init(self, event):
+            widget = event.widget
+            entry_widget = tkinter.Entry(
+                widget,
+                bg = 'gray',
+                selectbackground = Style.colour.bw[0],
+                relief = 'flat',
+                fg = 'white',
+                #insertbackground = 'lightblue'
+                justify = 'left',
+                )
+
+            entry_widget.insert(0,self.cget('text'))
+            entry_widget.select_range(0, 'end')
+            entry_widget.place(x=0, y=0, anchor="nw", relwidth=1.0, relheight=1.0)
+            entry_widget.bind("<Return>", self.edit_lock)
+            entry_widget.bind("<Escape>", self.edit_cancel)
+            entry_widget.bind("<FocusOut>", self.edit_lock)
+            entry_widget.focus_set()
+
+        def edit_lock(self, event):
+            entry = event.widget
+            i = entry.get()
+            if i != self.cget('text'):
+                if self.validate:
+                    i = self.validate(i)
+                self.config(text=i)
+            entry = event.widget
+            entry.destroy()
+        def edit_cancel(self, event):
+            entry = event.widget
+            entry.destroy()
+
 class LabeledWidget:
     class Label(tkinter.Label):
         def __init__(self,label,*args,**kwargs):
             super().__init__(*args,**kwargs)
             self.label = label
+class Properties_Frames:
+    @staticmethod
+    def get_frame(i,imgs):
+        out = {
+            'object':(Properties_Frames.Object_Generic, imgs.obj),
+        }
+        return out[i]
+
+    class Object_Generic(tkinter.Frame):
+        def __init__(self, master, obj=None, *args, **kwargs):
+            self.main_bg = Style.colour.bw[0]
+            super().__init__(master,*args,**kwargs,
+                bg = self.main_bg
+                )
+            self.master = master
+            self.obj = obj
+
+            self.title = tkinter.Label(self, text = 'Object Properties', bg = Style.colour.bw[1], fg = 'white',padx=3,pady=3)
+            self.title.pack(side = 'top', fill = 'both')
+
+            self.name_frame = tkinter.LabelFrame(self,text = 'Name',bg = self.main_bg,fg='white',padx=4,pady=4)
+            self.name_input = input_ui.GenericDisplay(
+                self.name_frame,
+                text = self.obj.name,
+                anchor = 'w',
+                validate=self.check_newname,
+                padx=2,pady=2
+                )
+            self.name_input.pack(fill='both')
+            self.name_frame.pack(side = 'top', fill = 'both', padx = 5)
+
+            self.loc_input = input_ui.DisplayFrame(
+                self,
+                text = 'Location',
+                x = self.obj.location.x,
+                y = self.obj.location.y,
+                z = self.obj.location.z
+            )
+            self.loc_input.pack(side='top',fill='both',padx=5,pady=5)
+
+            self.rot_input = input_ui.DisplayFrame(
+                self,
+                text = 'Rotation',
+                x = self.obj.rotation.x,
+                y = self.obj.rotation.y,
+                z = self.obj.rotation.z
+            )
+            self.rot_input.pack(side='top',fill='both',padx=5,pady=5)
+
+            self.size_input = input_ui.DisplayFrame(
+                self,
+                text = 'Scale',
+                x = self.obj.size.x,
+                y = self.obj.size.y,
+                z = self.obj.size.z
+            )
+            self.size_input.pack(side='top',fill='both',padx=5,pady=5)
+        def apply_all(self):
+            self.obj.location = self.loc_input.get_v3()
+            self.obj.rotation = self.rot_input.get_v3()
+            self.obj.size = self.size_input.get_v3()
+            self.obj.name = self.name_input.cget('text')
+            #update object display frame
+            self.obj.frame_instance.update()
+        def check_newname(self,name):
+            names = [k.name for k in self.obj.master.objects]
+            while name in names:
+                name = ria.misctools.increment(name)
+            return name
+
 class Style:
     class colour:
-        bw = ['#232323',
+        bw = [
+            '#232323',
+            '#313131',
             '#404040',
             '#575757',
             '#656565',
@@ -271,8 +388,8 @@ class Style:
         def properties(img_ls):
             out = {
                 'relief' : 'flat',
-                'bg' : Style.colour.bw[2],
-                'activebackground' : Style.colour.bw[3],
+                'bg' : Style.colour.bw[3],
+                'activebackground' : Style.colour.bw[4],
                 'image' : img_ls.pro}
             return out
         @staticmethod
@@ -404,7 +521,7 @@ class menus:
 
 if __name__ == '__main__':
     root = tkinter.Tk()
-    x = Vector3_ui.DisplayFrame(root, text = 'Location', x=1,y = 3, z = 4)
+    x = input_ui.DisplayFrame(root, text = 'Location', x=1,y = 3, z = 4)
     x.pack(fill='both')
     root.mainloop()
     

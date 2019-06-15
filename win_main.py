@@ -31,21 +31,21 @@ class main(tkinter.Frame):
         self.images = Style.images()
     
     def init_right_frame(self,panes):
-        self.right_frame = tkinter.Frame(panes,bg = Style.colour.bw[1])
+        self.right_frame = tkinter.Frame(panes,bg = Style.colour.bw[2])
         panes.add(self.right_frame,minsize=250)
         
-        title = tkinter.Label(self.right_frame, text = 'Object Outline',bg = Style.colour.bw[2],fg = 'white',padx=3,pady=3)
+        title = tkinter.Label(self.right_frame, text = 'Object Outline',bg = Style.colour.bw[3],fg = 'white',padx=3,pady=3)
         title.pack(side = 'top', fill='both')
         
 
-        self.obj_canvas = tkinter.Canvas(self.right_frame,width=1,highlightthickness=0,bg=Style.colour.bw[1])
+        self.obj_canvas = tkinter.Canvas(self.right_frame,width=1,highlightthickness=0,bg=Style.colour.bw[2])
         self.obj_canvas.pack(side='left',fill='both',expand=1)
         #scrollbar
         self.obj_scroll = tkinter.Scrollbar(self.right_frame, orient="vertical", command=self.obj_canvas.yview)
         self.obj_canvas.config(yscrollcommand=self.obj_scroll.set)
         self.obj_scroll.pack(side='right',fill='y')
         
-        self.obj_frame = tkinter.Frame(self.obj_canvas,bg=Style.colour.bw[1],padx = 5, pady = 10)
+        self.obj_frame = tkinter.Frame(self.obj_canvas,bg=Style.colour.bw[2],padx = 5, pady = 10)
         self.obj_frameCANV = self.obj_canvas.create_window((0, 0), window=self.obj_frame, anchor="nw")
 
         
@@ -53,13 +53,13 @@ class main(tkinter.Frame):
         self.obj_canvas.bind('<Configure>',self.objcanvas_width)
         self.obj_frame.bind('<Configure>',self.update_objscroll)
     def init_left_frame(self,panes):
-        left = tkinter.Frame(panes,bg='blue')
+        left = tkinter.Frame(panes,bg=Style.colour.bw[5])
         panes.add(left,minsize=250)
         
-        title = tkinter.Label(left, text = '3D Viewport',bg = Style.colour.bw[2],fg = 'white',padx=3,pady=3)#,anchor = 'w')
+        title = tkinter.Label(left, text = '3D Viewport',bg = Style.colour.bw[3],fg = 'white',padx=3,pady=3)#,anchor = 'w')
         title.pack(side = 'top', fill='both')
     def init_listbtns(self,root):
-        btn_frame = tkinter.Frame(root,bg = Style.colour.bw[1])
+        btn_frame = tkinter.Frame(root,bg = Style.colour.bw[2])
 
         add_btn = tkinter.Menubutton(
             btn_frame,
@@ -83,7 +83,7 @@ class main(tkinter.Frame):
         if self.handler.active:
             self.handler.active.properties_temp()
 
-            props_win = win_properties.main(tkinter.Toplevel())
+            props_win = win_properties.main(tkinter.Toplevel(),self.handler.active)
             #props_win.grab_set()
             props_win.mainloop()
         else:

@@ -76,6 +76,9 @@ class Object3D:
         self.rotation = rotation
         self.size = size
         self.frame_instance = frame_instance
+
+        #properties window
+        self.data = ['object']
     def translate(self, tA):
         self.location += tA
     def rotate(self, rA):
