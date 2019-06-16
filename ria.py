@@ -1,4 +1,4 @@
-import misctools,tkinter
+import misctools,tkinter,numpy,mesh
 import win_transform
 
 class Vector3:
@@ -22,12 +22,19 @@ class Vector3:
             self.z*sA)
     def straight_product(self,vA):
         return Vector3(
-            self.x*vA.z,
+            self.x*vA.x,
             self.y*vA.y,
             self.z*vA.z)
-    def vector_scale(self, vA):
-        nx,ny,nz = vA * self.x , vA * self.y, vA * self.z
-        return Vector3(nx,ny,nz)
+    def dot_product(self, vA):
+        '''Returns scalar (float) value'''
+        return float((self.x*vA.x)+(self.y*vA.y)+(self.y*vA.y))
+    def cross_product(self, vA):
+        '''Returns Vector3D value'''
+        return Vector3(
+            self.y*vA.z - self.z*vA.y,
+            self.z*vA.x - self.x*vA.z,
+            self.x*vA.y - self.y*vA.x
+            )
     @staticmethod
     def unit():
         return Vector3(1,1,1)
@@ -47,11 +54,10 @@ class Vector2:
             self.x+vA.x,
             self.y+vA.y)
     def __mul__(self,sA):
-        if type(sA) not in (float,str,):
-            raise Exception('Affector must be scalar')
         return Vector2(
             self.x*sA,
             self.y*sA)
+    
     @staticmethod
     def unit():
         return Vector2(1,1)
@@ -124,10 +130,11 @@ class Mesh:
     def __init__(self, vertices, faces):
         self.vertices = vertices
         self.faces = faces
-    def global_space(self,master):
+    def local_to_global(self,master):
+        #master is parent object
         gVs = []
         for vertex in self.vertices:
-            n = vertex.vector_scale(master.size)
+            n = vertex.straight_product(master.size)
             n += master.location
             gVs.append(n)
         return gVs
@@ -166,10 +173,14 @@ class ObjectMaster:
     def transform_objects(self,obj_list):
         trans_win = win_transform.main(tkinter.Toplevel(),obj_list)
         trans_win.mainloop()
+
+
+                
+
+
 from ria_objs import *
+import viewer
 if __name__ == '__main__':
-    handlers = []
-    handler = ObjectMaster()
-    print(handler)
-    handlers.append(handler)
-    print(handlers[0])
+    cam1 = viewer.ViewCam.Ortho()
+
+    print([str(i) for i in cam1.global_to_local(mesh.cube().vertices)])

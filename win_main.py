@@ -53,11 +53,16 @@ class main(tkinter.Frame):
         self.obj_canvas.bind('<Configure>',self.objcanvas_width)
         self.obj_frame.bind('<Configure>',self.update_objscroll)
     def init_left_frame(self,panes):
-        left = tkinter.Frame(panes,bg=Style.colour.bw[5])
+        left = tkinter.Frame(panes,bg='red')#Style.colour.bw[5])
         panes.add(left,minsize=250)
         
         title = tkinter.Label(left, text = '3D Viewport',bg = Style.colour.bw[3],fg = 'white',padx=3,pady=3)#,anchor = 'w')
         title.pack(side = 'top', fill='both')
+
+        self.canvas_master = ria.viewer.ViewMaster(left,obj_master = self.handler, bg = Style.colour.bw[5],highlightthickness=0)# grey border caused by highlightthickness
+        self.canvas_master.pack(side = 'top', fill='both',expand = 1,padx= 0, pady=0)
+        self.canvas_master.bind('<Button-1>', self.canvas_master.update)
+        
     def init_listbtns(self,root):
         btn_frame = tkinter.Frame(root,bg = Style.colour.bw[2])
 

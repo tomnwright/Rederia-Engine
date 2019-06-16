@@ -76,11 +76,11 @@ def parse_obj(f_path):
             if line.startswith('f '):
                 fv_list = line.split(" ")
                 #split vertices, remove 'f' header
-                face = [int(rfv.split("/")[0]) for rfv in fv_list[1:]]
+                face = [int(rfv.split("/")[0])-1 for rfv in fv_list[1:]]
                 Fs.append(face)
     return Vs, Fs
 if __name__ == '__main__':
-    #v,f = parse_obj('tests/unit_plane.obj')
-    #print([str(i) for i in v], f)
-    for i in range(10):
-        print(get_intDisplay(1969123.723097,i))
+    v,f = parse_obj('tests/unit_plane.obj')
+    print(',\n'.join([str(i) for i in f]))
+    '''for i in range(10):
+        print(get_intDisplay(1969123.723097,i))'''

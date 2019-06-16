@@ -31,12 +31,13 @@ class Empty(ria.Object3D):
 class Curve(ria.Object3D):
     def __init__(self, master, *args,**kwargs):
         super().__init__(master,name='Curve',*args,**kwargs)
-class Camera(ria.Object3D):
-    def __init__(self, master, *args,**kwargs):
-        super().__init__(master,name='Camera',*args,**kwargs)
 class Directional(ria.Object3D):
     def __init__(self, master, *args,**kwargs):
         super().__init__(master,name='Directional',*args,**kwargs)
 class Point(ria.Object3D):
     def __init__(self, master, *args,**kwargs):
         super().__init__(master,name='Point',*args,**kwargs)
+
+class Camera(ria.Object3D):
+    def __init__(self, master, *args,**kwargs):
+        super().__init__(master,name='Camera',*args,**kwargs)
