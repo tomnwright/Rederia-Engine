@@ -1,12 +1,14 @@
 from ria import *
+import ctypes
 import numpy,tkinter
 class ViewCam:
     class Ortho:
         '''Orthographic only, for now'''
         def __init__(self):
             
-            self.b = Vector3(0,0,1)
-            self.c = Vector3(1,0,0)
+            self.b = Vector3.right()
+            self.c = Vector3.down() #y axis on canvas is inverted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
 
             self.normal = self.b.cross_product(self.c)
         def project_verts(self, vertices):
@@ -29,20 +31,44 @@ class ViewCam:
                 sol = numpy.linalg.solve(all_co, all_k) #solution
                 gVs.append(Vector2(sol[0],sol[1]))
             return gVs
+        def rotate(self, rB, rC):
+            self.b = self.b.rotate(Vector3.up() * rB).normalise()
+            self.c = self.c.rotate(Vector3.right() * rC).normalise()
+            self.normal = self.b.cross_product(self.c)
 
 
 
 class ViewMaster(tkinter.Canvas):
     def __init__(self, *args, obj_master = None, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.rotSpeed = .01
 
         self.obj_master = obj_master
         self.viewer = ViewCam.Ortho()
         self.view_objects = []
+        self.bind("<Configure>",self.onResize)
+
+        self.bind("<2>", self.dragStart)
+        self.bind("<B2-Motion>", self.dragMove)
     def update(self,*args):
         self.delete('all'); self.view_objects = []
         for obj in self.obj_master.objects:
             self.view_objects.append(Mesh_View(self, obj.mesh, self.viewer,obj))
+    def onResize(self, event):
+        self.update()
+    
+    
+    def dragStart(self, event):
+        self.lastPos =  Vector2(event.x, event.y)
+    def dragMove(self, event):
+        newPos = Vector2(event.x, event.y)
+        delta = newPos - self.lastPos
+        delta *= self.rotSpeed
+        self.viewer.rotate(delta.x, delta.y)
+        self.update()
+
+        self.lastPos = newPos
         
 
 class Mesh_View:
@@ -51,10 +77,10 @@ class Mesh_View:
         self.cam_edges = []
         for face in mesh.faces:
             for e,v in enumerate(face):
-                if e>0:
-                    new_e = [v, face[e-1]]
-                    if new_e not in self.cam_edges:
-                        self.cam_edges.append(new_e)
+                #when e = 0, [e-1] < 0
+                new_e = [v, face[e-1]]
+                if new_e not in self.cam_edges:
+                    self.cam_edges.append(new_e)
         centre = Vector2(canvas.winfo_width()*0.5, canvas.winfo_height()*0.5)
         self.lines = []
         for edge in self.cam_edges:

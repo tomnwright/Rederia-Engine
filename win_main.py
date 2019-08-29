@@ -62,6 +62,8 @@ class main(tkinter.Frame):
         self.canvas_master = ria.viewer.ViewMaster(left,obj_master = self.handler, bg = Style.colour.bw[5],highlightthickness=0)# grey border caused by highlightthickness
         self.canvas_master.pack(side = 'top', fill='both',expand = 1,padx= 0, pady=0)
         self.canvas_master.bind('<Button-1>', self.canvas_master.update)
+
+        #left.bind_all("<Configure>", self.canvas_master.update)
         
     def init_listbtns(self,root):
         btn_frame = tkinter.Frame(root,bg = Style.colour.bw[2])

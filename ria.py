@@ -1,4 +1,4 @@
-import misctools,tkinter,numpy,mesh
+import misctools,tkinter,numpy,mesh,math
 import win_transform
 
 class Vector3:
@@ -14,12 +14,21 @@ class Vector3:
             self.y+vA.y,
             self.z+vA.z)
     def __mul__(self,sA):
-        if type(sA) in (float,str,):
+        if type(sA) not in (float,int,):
             raise Exception('Affector must be scalar')
         return Vector3(
             self.x*sA,
             self.y*sA,
-            self.z*sA)
+            self.z*sA)    
+    __rmul__ = __mul__
+    def __truediv__(self, sA):
+        if type(sA) not in (float,int,):
+            raise Exception('Affector must be scalar')
+        return Vector3(
+            self.x / sA,
+            self.y / sA,
+            self.z / sA) 
+
     def straight_product(self,vA):
         return Vector3(
             self.x*vA.x,
@@ -35,13 +44,58 @@ class Vector3:
             self.z*vA.x - self.x*vA.z,
             self.x*vA.y - self.y*vA.x
             )
+    def magnitude(self):
+        return math.sqrt((self.x ** 2)+(self.y ** 2)+(self.z ** 2))
+    def normalise(self):
+        return self / self.magnitude()
+
+
+
+    def rotate(self, rot):
+        rotX = numpy.array([
+            [1, 0, 0,],
+            [0, math.cos(rot.x), -1 * math.sin(rot.x)],
+            [0, math.sin(rot.x), math.cos(rot.x)],
+            ])
+        rotY = numpy.array([
+            [math.cos(rot.y), 0, math.sin(rot.y),],
+            [0, 1, 0,],
+            [-1* math.sin(rot.y), 0, math.cos(rot.y),],
+            ])
+        rotZ = numpy.array([
+            [math.cos(rot.z), -1 * math.sin(rot.z), 0,],
+            [math.sin(rot.z), math.cos(rot.z), 0,],
+            [0, 0, 1,],
+        ])
+
+        out = numpy.reshape([self.x, self.y, self.z], (1,3)).dot(rotX).dot(rotY).dot(rotZ)
+        return Vector3(out[0][0], out[0][1], out[0][2])
     @staticmethod
     def unit():
         return Vector3(1,1,1)
     @staticmethod
     def zero():
         return Vector3()
-    __rmul__ = __mul__
+    
+    @staticmethod
+    def left():
+        return Vector3(-1,0,0)
+    @staticmethod
+    def right():
+        return Vector3(1,0,0)
+    @staticmethod
+    def forward():
+        return Vector3(0,1,0)
+    @staticmethod
+    def backward():
+        return Vector3(0,-1,0)
+    @staticmethod
+    def up():
+        return Vector3(0,0,1)
+    @staticmethod
+    def down():
+        return Vector3(0,0,-1)
+    
 
 class Vector2:
     def __init__(self,x=0,y=0):
@@ -51,13 +105,17 @@ class Vector2:
         return ("({}, {})".format(self.x,self.y))
     def __add__(self, vA):
         return Vector2(
-            self.x+vA.x,
-            self.y+vA.y)
+            self.x + vA.x,
+            self.y + vA.y)
+    def __sub__(self, vA):
+        return Vector2(
+            self.x - vA.x,
+            self.y - vA.y)
     def __mul__(self,sA):
         return Vector2(
             self.x*sA,
             self.y*sA)
-    
+            
     @staticmethod
     def unit():
         return Vector2(1,1)
@@ -134,7 +192,7 @@ class Mesh:
         #master is parent object
         gVs = []
         for vertex in self.vertices:
-            n = vertex.straight_product(master.size)
+            n = (vertex.straight_product(master.size)).rotate(master.rotation)
             n += master.location
             gVs.append(n)
         return gVs
@@ -181,6 +239,7 @@ class ObjectMaster:
 from ria_objs import *
 import viewer
 if __name__ == '__main__':
-    cam1 = viewer.ViewCam.Ortho()
-
-    print([str(i) for i in cam1.global_to_local(mesh.cube().vertices)])
+    #cam1 = viewer.ViewCam.Ortho()
+    x = Vector3(1,0,0)
+    print(x.rotate(Vector3(0,0,1)))
+    #print([str(i) for i in cam1.global_to_local(mesh.cube().vertices)])
