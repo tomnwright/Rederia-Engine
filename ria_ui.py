@@ -356,6 +356,10 @@ class Style:
             self.tg1 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_deselected.png')
             self.tg2 = tkinter.PhotoImage(file = 'graphics/symbols/toggle_selected.png')
             self.obj = tkinter.PhotoImage(file = 'graphics/symbols/object.png')
+            self.tor = tkinter.PhotoImage(file = 'graphics/symbols/torus.png')
+            self.mon = tkinter.PhotoImage(file = 'graphics/symbols/monkey.png')
+            self.kle = tkinter.PhotoImage(file = 'graphics/symbols/klein.png')
+            
 
             self.translate = tkinter.PhotoImage(file = 'graphics/transformations/translate.png')
             self.rotate = tkinter.PhotoImage(file = 'graphics/transformations/rotate.png')
@@ -373,6 +377,9 @@ class Style:
                 ria.Directional : self.dir,
                 ria.Poly : self.pol,
                 ria.Camera : self.cam,
+                ria.Torus : self.tor,
+                ria.Monkey: self.mon,
+                ria.Klein : self.kle,
             }
             return class_to_img[obj_class]
     class button:
@@ -509,6 +516,12 @@ class menus:
         add_menu.add_command(label = 'UV Sphere',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Sphere))
         add_menu.add_command(label = 'Ico Sphere',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Icosphere))
         add_menu.add_command(label = 'Cylinder',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Cylinder))
+
+        add_menu.add_separator()
+        add_menu.add_command(label = 'Torus',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Torus))
+        add_menu.add_command(label = 'Klein Bottle',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Klein))
+        add_menu.add_command(label = 'Monkey',command = lambda: add_funcs.generic(root, root.obj_frame, ria.Monkey))
+
         add_menu.add_separator()
         add_menu.add_command(label = 'Curve',command = lambda: add_funcs.generic(root,root.obj_frame,ria.Curve))
         return add_menu
@@ -524,4 +537,5 @@ if __name__ == '__main__':
     x = input_ui.DisplayFrame(root, text = 'Location', x=1,y = 3, z = 4)
     x.pack(fill='both')
     root.mainloop()
+    
     

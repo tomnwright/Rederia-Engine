@@ -9,9 +9,10 @@ class ViewCam:
             self.b = Vector3.right()
             self.c = Vector3.down() #y axis on canvas is inverted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
 
+            self.size = 1
 
             self.normal = self.b.cross_product(self.c)
-        def project_verts(self, vertices):
+        def project_verts_old(self, vertices):
             gVs = []
             a = Vector3.zero() # SET TO POSITION!!!
             for vertex in vertices:
@@ -31,9 +32,32 @@ class ViewCam:
                 sol = numpy.linalg.solve(all_co, all_k) #solution
                 gVs.append(Vector2(sol[0],sol[1]))
             return gVs
-        def rotate(self, rB, rC):
-            self.b = self.b.rotate(Vector3.up() * rB).normalise()
-            self.c = self.c.rotate(Vector3.right() * rC).normalise()
+        
+        def project_verts(self, vertices):
+            gVs = []
+            a = Vector3.zero() # SET TO POSITION!!!
+            for vertex in vertices:
+                # b.{xyz}[l] + c.{xyz}[m] + normal.{xyz}[alpha] = k where: k = (P.{xyz} - location.{xyz})
+                
+                #x coefficients
+                x_co = [self.b.x, self.c.x, self.normal.x]
+                y_co = [self.b.y, self.c.y, self.normal.y]
+                z_co = [self.b.z, self.c.z, self.normal.z]
+            
+                all_co = numpy.array([x_co, y_co, z_co])
+                all_k = numpy.array([
+                    vertex.x - a.x,
+                    vertex.y - a.y,
+                    vertex.z - a.z])
+                
+                sol = numpy.linalg.solve(all_co, all_k) #solution
+                gVs.append(self.size * Vector2(sol[0],sol[1]))
+            return gVs
+
+        def rotate(self, tB, tC):
+            bA,cA = self.b, self.c
+            self.b = self.b.rotateAround(self.c, tB).normalise()
+            self.c = self.c.rotateAround(self.b, -tC).normalise()
             self.normal = self.b.cross_product(self.c)
 
 
@@ -51,10 +75,15 @@ class ViewMaster(tkinter.Canvas):
 
         self.bind("<2>", self.dragStart)
         self.bind("<B2-Motion>", self.dragMove)
+
+        self.bind('<MouseWheel>', self.on_mousewheel)
+
     def update(self,*args):
+
         self.delete('all'); self.view_objects = []
         for obj in self.obj_master.objects:
             self.view_objects.append(Mesh_View(self, obj.mesh, self.viewer,obj))
+        
     def onResize(self, event):
         self.update()
     
@@ -69,6 +98,11 @@ class ViewMaster(tkinter.Canvas):
         self.update()
 
         self.lastPos = newPos
+    def on_mousewheel(self, event):
+        speed = 1.1
+        self.viewer.size *=  (speed) ** (event.delta / 120)
+        
+        self.update()
         
 
 class Mesh_View:
@@ -87,6 +121,3 @@ class Mesh_View:
             start_v = centre+ (self.cam_verts[edge[0]]* 50)
             end_v = centre+ (self.cam_verts[edge[1]]* 50)
             self.lines.append(canvas.create_line(start_v.x,start_v.y,end_v.x,end_v.y))
-
-
-            

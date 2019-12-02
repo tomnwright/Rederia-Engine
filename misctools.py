@@ -82,5 +82,6 @@ def parse_obj(f_path):
 if __name__ == '__main__':
     v,f = parse_obj('tests/unit_plane.obj')
     print(',\n'.join([str(i) for i in f]))
+    print(v)
     '''for i in range(10):
         print(get_intDisplay(1969123.723097,i))'''

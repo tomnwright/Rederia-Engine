@@ -1,4 +1,4 @@
-import ria
+import ria, misctools
 
 def cube():
     Vs = [
@@ -33,3 +33,6 @@ def plane():
         ]
     return ria.Mesh(Vs,Fs)
 
+def from_obj (file):
+    fV, fF = misctools.parse_obj(file)
+    return ria.Mesh (fV, fF)

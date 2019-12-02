@@ -1,6 +1,8 @@
-import misctools,tkinter,numpy,mesh,math
+import misctools,tkinter,numpy,mesh
+from math import *
 import win_transform
-
+def sq(x):
+    return x**2
 class Vector3:
     def __init__(self,x=0,y=0,z=0):
         self.x = x
@@ -45,31 +47,44 @@ class Vector3:
             self.x*vA.y - self.y*vA.x
             )
     def magnitude(self):
-        return math.sqrt((self.x ** 2)+(self.y ** 2)+(self.z ** 2))
+        return sqrt((self.x ** 2)+(self.y ** 2)+(self.z ** 2))
     def normalise(self):
         return self / self.magnitude()
-
 
 
     def rotate(self, rot):
         rotX = numpy.array([
             [1, 0, 0,],
-            [0, math.cos(rot.x), -1 * math.sin(rot.x)],
-            [0, math.sin(rot.x), math.cos(rot.x)],
+            [0, cos(rot.x), -1 * sin(rot.x)],
+            [0, sin(rot.x), cos(rot.x)],
             ])
         rotY = numpy.array([
-            [math.cos(rot.y), 0, math.sin(rot.y),],
+            [cos(rot.y), 0, sin(rot.y),],
             [0, 1, 0,],
-            [-1* math.sin(rot.y), 0, math.cos(rot.y),],
+            [-1* sin(rot.y), 0, cos(rot.y),],
             ])
         rotZ = numpy.array([
-            [math.cos(rot.z), -1 * math.sin(rot.z), 0,],
-            [math.sin(rot.z), math.cos(rot.z), 0,],
+            [cos(rot.z), -1 * sin(rot.z), 0,],
+            [sin(rot.z), cos(rot.z), 0,],
             [0, 0, 1,],
         ])
 
         out = numpy.reshape([self.x, self.y, self.z], (1,3)).dot(rotX).dot(rotY).dot(rotZ)
         return Vector3(out[0][0], out[0][1], out[0][2])
+    def rotateAround(self, nA, theta):
+        u,v,w = nA.x, nA.y, nA.z
+        x,y,z = self.x, self.y, self.z
+        out = Vector3 (
+            (u)*(u*x + v*y + w*z)*(1-cos(theta)) + (x * cos(theta)) + ((v*z - w*y)*sin(theta)),
+            (v)*(u*x + v*y + w*z)*(1-cos(theta)) + (y * cos(theta)) + ((w*x - u*z)*sin(theta)),
+            (w)*(u*x + v*y + w*z)*(1-cos(theta)) + (z * cos(theta)) + ((u*y - v*x)*sin(theta)),
+        )
+        #print(out)
+        return out
+
+
+    
+    
     @staticmethod
     def unit():
         return Vector3(1,1,1)
