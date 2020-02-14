@@ -1,20 +1,29 @@
-import misctools,tkinter,numpy,mesh
+import numpy
 from math import *
-import win_transform
+
 def sq(x):
     return x**2
+
+##########################################
+#############   BASICS   #################
+##########################################
+
 class Vector3:
+
     def __init__(self,x=0,y=0,z=0):
         self.x = x
         self.y = y
         self.z = z
+
     def __str__(self):
         return ("({}, {}, {})".format(self.x,self.y,self.z))
+        
     def __add__(self, vA):
         return Vector3(
             self.x+vA.x,
             self.y+vA.y,
             self.z+vA.z)
+
     def __mul__(self,sA):
         if type(sA) not in (float,int,):
             raise Exception('Affector must be scalar')
@@ -23,6 +32,7 @@ class Vector3:
             self.y*sA,
             self.z*sA)    
     __rmul__ = __mul__
+
     def __truediv__(self, sA):
         if type(sA) not in (float,int,):
             raise Exception('Affector must be scalar')
@@ -36,9 +46,11 @@ class Vector3:
             self.x*vA.x,
             self.y*vA.y,
             self.z*vA.z)
+
     def dot_product(self, vA):
         '''Returns scalar (float) value'''
         return float((self.x*vA.x)+(self.y*vA.y)+(self.y*vA.y))
+
     def cross_product(self, vA):
         '''Returns Vector3D value'''
         return Vector3(
@@ -46,11 +58,12 @@ class Vector3:
             self.z*vA.x - self.x*vA.z,
             self.x*vA.y - self.y*vA.x
             )
+
     def magnitude(self):
         return sqrt((self.x ** 2)+(self.y ** 2)+(self.z ** 2))
+
     def normalise(self):
         return self / self.magnitude()
-
 
     def rotate(self, rot):
         rotX = numpy.array([
@@ -71,6 +84,7 @@ class Vector3:
 
         out = numpy.reshape([self.x, self.y, self.z], (1,3)).dot(rotX).dot(rotY).dot(rotZ)
         return Vector3(out[0][0], out[0][1], out[0][2])
+
     def rotateAround(self, nA, theta):
         u,v,w = nA.x, nA.y, nA.z
         x,y,z = self.x, self.y, self.z
@@ -82,16 +96,12 @@ class Vector3:
         #print(out)
         return out
 
-
-    
-    
     @staticmethod
     def unit():
         return Vector3(1,1,1)
     @staticmethod
     def zero():
         return Vector3()
-    
     @staticmethod
     def left():
         return Vector3(-1,0,0)
@@ -111,25 +121,47 @@ class Vector3:
     def down():
         return Vector3(0,0,-1)
     
-
 class Vector2:
     def __init__(self,x=0,y=0):
         self.x = x
         self.y = y
+
     def __str__(self):
         return ("({}, {})".format(self.x,self.y))
+
     def __add__(self, vA):
         return Vector2(
             self.x + vA.x,
             self.y + vA.y)
+
     def __sub__(self, vA):
         return Vector2(
             self.x - vA.x,
             self.y - vA.y)
+
     def __mul__(self,sA):
         return Vector2(
             self.x*sA,
             self.y*sA)
+        __rmul__ = __mul__
+
+    def __truediv__(self, sA):
+        if type(sA) not in (float,int,):
+            raise Exception('Affector must be scalar')
+        return Vector2(
+            self.x / sA,
+            self.y / sA,
+        )
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+
+    def toInt(self):
+        return (int(self.x), int(self.y),)
+
+    def max(self):
+        return max(self.x, self.y)
             
     @staticmethod
     def unit():
@@ -137,124 +169,155 @@ class Vector2:
     @staticmethod
     def zero():
         return Vector2()
-    __rmul__ = __mul__
+    
+
+##########################################
+#############   OBJECT   #################
+##########################################
 
 class Object3D:
-    def __init__(
-        self,
-        master,
-        name,
-        location = Vector3.zero(),
-        rotation = Vector3.zero(),
-        size = Vector3.unit(),
-        frame_instance = None):
-        #___________________
-        self.master = master
-        self.set_name(name)
+    def __init__(self, name, location = Vector3.zero(), rotation = Vector3.zero(), scale = Vector3.unit()):
+        
+        self.name = name
         self.location = location
         self.rotation = rotation
-        self.size = size
-        self.frame_instance = frame_instance
+        self.scale = scale
 
         #properties window
         self.data = ['object']
+
     def translate(self, tA):
         self.location += tA
     def rotate(self, rA):
         self.rotation += rA
     def scale(self,sA):
-        self.size = self.size.straight_product(sA)
-    def set_name(self,new_name):
-        names = [i.name for i in self.master.objects]
-        while new_name in names:
-            new_name = misctools.increment(new_name)
-        self.name = new_name
-        return self.name
-    def delete(self):
-        self.frame_instance.destroy()
-        if self in self.master.selected:
-            self.master.selected.remove(self)
-            if self.master.active is self:
-                self.master.active = None
-        self.master.objects.remove(self)
-    def toggle_select(self):
-        if self.master.active == self:
-            self.master.active = None
-            self.master.selected.remove(self)
-            self.frame_instance.set_deselected()
-        else:
-            ria.misctools.select(self.master.selected,self)
-            self.frame_instance.set_active()
-            if self.master.active:
-                self.master.active.frame_instance.set_selected()
-            self.master.active = self
-    def properties_temp(self):
-        print("___OBJ___\nName : {}\nType : {}\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.name,type(self),self.location,self.rotation,self.size))
-    
+        self.scale = self.scale.straight_product(sA)
+
+    def __str__(self):
+        return "{} ({})\nLocation : {}\nRotation : {}\nScale : {}\n_______".format(self.name,type(self),self.location,self.rotation,self.scale)
+
 
 class MeshObject(Object3D):
     #restructure to include mesh
-    def __init__(self,*args,mesh,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(self,name, location, rotation, scale, mesh, **kwargs):
+        super().__init__(name, location, rotation, scale, **kwargs)
         self.mesh = mesh
 
 class Mesh:
-    #restructure to include mesh
-    def __init__(self, vertices, faces):
+    def __init__(self, vertices, edges, faces):
         self.vertices = vertices
+        self.edges = edges
         self.faces = faces
-    def local_to_global(self,master):
-        #master is parent object
-        gVs = []
-        for vertex in self.vertices:
-            n = (vertex.straight_product(master.size)).rotate(master.rotation)
-            n += master.location
-            gVs.append(n)
-        return gVs
 
-class ObjectMaster:
-    def __init__(self):
-        self.objects = []
-        self.active = None
-        self.selected = []
-    def add_object(self, new_obj):
-        self.objects.append(new_obj)
-        return new_obj
-    def ls_objs(self):
-        print([i.name for i in self.objects])
-    def debug_selection(self):
-        print('Active: {}\n Selected: {}\n'.format(self.active,[i.name for i in self.selected]))
-    def delete_selection(self):
-        while self.selected:
-            target = self.selected.pop(0)
-            #note that Object3D.delete() removes ITSELF from [selected] and from [active]
-            target.delete()
-        self.selected = []
-        self.active = None
+    def vertex_local_to_global(self, vertex, parentObj):
+        '''Converts vertex to global'''
+        n = (vertex.straight_product(parentObj.scale)).rotate(parentObj.rotation)
+        n += parentObj.location
+        return n
 
 
-    def select_all(self):
-        if self.selected:
-            for i in self.selected:
-                i.frame_instance.set_deselected()
-            self.selected = []
-            self.active = None
-        else:
-            for i in self.objects:
-                self.selected.append(i)
-                i.frame_instance.set_selected()
-    def transform_objects(self,obj_list):
-        trans_win = win_transform.main(tkinter.Toplevel(),obj_list)
-        trans_win.mainloop()
+##########################################
+#############  CAMERAS   #################
+##########################################
+
+class Orthographic(Object3D):
+    def __init__(self, name, location, rotation, scale, orthoscale, **kwargs):
+
+        super().__init__(name, location, rotation, scale, **kwargs)
+
+        self.orthoscale = orthoscale
+
+    def projectvertex_old(self, vertex):
+            
+            a = self.location # SET TO POSITION!!!
+            b = (Vector3.left().rotate(self.rotation)).normalise()
+            c = (Vector3.backward().rotate(self.rotation)).normalise() #y axis on canvas is inverted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
+            print(a,b,c)
+            print(self.rotation)
+            normal = b.cross_product(c) #should the normal be normalised?
+            
+            # b.{xyz}[l] + c.{xyz}[m] + normal.{xyz}[alpha] = k where: k = (P.{xyz} - location.{xyz})
+            
+            #x coefficients
+            x_co = [b.x, c.x, normal.x]
+            y_co = [b.y, c.y, normal.y]
+            z_co = [b.z, c.z, normal.z]
+        
+            all_co = numpy.array([x_co, y_co, z_co])
+            all_k = numpy.array([
+                vertex.x - a.x,
+                vertex.y - a.y,
+                vertex.z - a.z])
+            
+            sol = numpy.linalg.solve(all_co, all_k) #solution
+            return Vector2(sol[0],sol[1])
+
+        
+    def projectedges(self, meshobject):
+
+        mesh = meshobject.mesh
+        
+
+        self.lines = []
+        for edge in mesh.edges:
+
+            start_v = self.projectvertex_old(
+                mesh.vertex_local_to_global(
+                    mesh.vertices[edge[0]],
+                    meshobject)
+            )
+
+            end_v   = self.projectvertex_old(
+                mesh.vertex_local_to_global(
+                    mesh.vertices[edge[1]],
+                    meshobject
+                )
+            )
+            
+            yield (start_v, end_v,)
+
+        return
+    
+    def getpixelscale(self, resolution):
+        '''returns pixel length of 1 scene unit'''
+
+        return resolution.max() /  self.orthoscale
+
+class Perspective(Object3D):
+    def __init__(self, name, location, rotation, scale, fov, focal, **kwargs):
+
+        super().__init__(name, location, rotation, scale, **kwargs)
+
+        self.fov = fov #field of view
+        self.focal = focal #focal length
+ 
+
+##########################################
+##########   LIGHT SOURCES   #############
+##########################################
+
+class Directional(Object3D):
+    def __init__(self, name, location, rotation, scale, colour, strength, specular, angle, **kwargs):
+
+        super().__init__(name, location, rotation, scale, **kwargs)
+
+        self.colour = colour
+        self.strength = strength
+        self.specular = specular
+        self.angle = angle
 
 
-                
+class Point(Object3D):
+    def __init__(self, name, location, rotation, scale, colour, power, specular, radius, **kwargs):
 
+        super().__init__(name, location, rotation, scale, **kwargs)
 
-from ria_objs import *
-import viewer
+        self.colour = colour
+        self.power = power
+        self.specular = specular
+        self.radius = radius
+
 if __name__ == '__main__':
-    #cam1 = viewer.ViewCam.Ortho()
-    x = Vector3(1,0,0)
-    print(x.rotate(Vector3(0,0,1)))
-    #print([str(i) for i in cam1.global_to_local(mesh.cube().vertices)])
+    v2 = Vector2(3,5)
+    print(tuple(v2))
