@@ -59,7 +59,7 @@ class main(tkinter.Frame):
         title = tkinter.Label(left, text = '3D Viewport',bg = Style.colour.bw[3],fg = 'white',padx=3,pady=3)#,anchor = 'w')
         title.pack(side = 'top', fill='both')
 
-        self.canvas_master = ria.viewer.ViewMaster(left,obj_master = self.handler, bg = Style.colour.bw[5],highlightthickness=0)# grey border caused by highlightthickness
+        self.canvas_master = ria.viewer.ViewMaster(left,obj_master = self.handler, bg = 'white',highlightthickness=0)# grey border caused by highlightthickness
         self.canvas_master.pack(side = 'top', fill='both',expand = 1,padx= 0, pady=0)
         self.canvas_master.bind('<Button-1>', self.canvas_master.update)
 
