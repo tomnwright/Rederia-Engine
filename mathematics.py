@@ -1,5 +1,6 @@
 from math import *
 from copy import deepcopy as copy
+from bresenham import bresenham
 
 class NumberArray(list):
     '''
@@ -33,6 +34,7 @@ class NumberArray(list):
         return sum(
             [ ( a[i]* b[i] ) for i in range(L) ]
         )
+
 class Matrix:
     '''
     2D number matrix,
@@ -164,6 +166,34 @@ class Matrix:
 
     def Print(self):
         print("\n".join([str(i) for i in self.rows]))
+    
+    @staticmethod
+    def FromRows(rows):
+        '''
+        Create Matrix instance from list of rows.
+        '''
+        if not isinstance(rows, list):
+            raise TypeError("rows argument must be list, not {}".format(type(rows)))
+        
+        rows = Matrix.Tools.HomoNest(rows)
+
+        width = 0
+        for row in rows:
+            if len(row) > width:
+                width = len(row)
+        
+        cols = [NumberArray() for i in range(width)]
+
+        for j, row in enumerate(rows):
+            for i, element in enumerate(row):
+                cols[i].append(element) 
+
+        return Matrix(cols)
+
+    @staticmethod
+    def Empty(columns, rows):
+        d = [[0] * rows] * columns
+        return Matrix(d)
 
     class Tools:
         @staticmethod
@@ -248,16 +278,21 @@ class Matrix:
                 
                 data.append(col)
             
+            print(type(a))
             out = type(a)()
             out.data = data
             return out          
+
 class Vector3(Matrix):
 
     def __init__(self, x = 0, y = 0, z = 0):
         super().__init__([[x, y, z]])
     def __str__(self):
         return "v({}, {}, {})".format(self.x, self.y, self.z)
-
+    def __iter__(self):
+        yield self.x
+        yield self.y
+        yield self.z
     @property
     def x(self):
         return self.data[0][0]
@@ -281,6 +316,29 @@ class Vector3(Matrix):
     def z(self, value):
         self.data[0][2] = value
         return
+
+    def ToMatrix(self):
+        return Matrix(self.data)
+    def cross(self, v):
+        pass
+    def dot(self, v):
+        if not isinstance(v, Vector3):
+            raise TypeError("Cannot calculate dot product of Vector3 and {}".format(type(v)))
+
+        a = self[0]
+        b= v[0]
+
+        return NumberArray.Dot(a, b)
+    def straight(self, v):
+        if not isinstance(v, Vector3):
+            raise TypeError("Cannot calculate straight product of Vector3 and {}".format(type(v)))
+
+        out = copy(self)
+        out.x *= v.x
+        out.y *= v.y
+        out.z *= v.z
+
+        return out
 
     @property
     def magnitude(self):
@@ -317,13 +375,99 @@ class Vector3(Matrix):
     def down(self):
         return Vector3(0,0,-1)
     
-    def ToMatrix(self):
-        return Matrix(self.data)
+   
     @staticmethod
     def FromMatrix(matrix):
         out = Vector3()
         out.data = matrix.data
         return out
 
+    class Transform:
+        @staticmethod
+        def rotX(t):
+            '''
+            Elementary rotation of theta (t)
+            around the x axis (negative clockwise)
+            '''
+            return Matrix.FromRows(
+                [
+                    [1, 0, 0],
+                    [0, cos(t), -sin(t)],
+                    [0, sin(t), cos(t)]
+                ]
+            )
+        @staticmethod
+        def rotY(t):
+            '''
+            Elementary rotation of theta (t)
+            around the y axis (negative clockwise)
+            '''
+            return Matrix.FromRows(
+                [
+                    [cos(t), 0, sin(t)],
+                    [0, 1, 0],
+                    [-sin(t), 0, cos(t)]
+                ]
+            )
+        @staticmethod
+        def rotZ(t):
+            '''
+            Elementary rotation of theta (t)
+            around the z axis (positive clockwise)
+            '''
+            return Matrix.FromRows(
+                [
+                    [cos(t), -sin(t), 0],
+                    [sin(t), cos(t), 0],
+                    [0, 0, 1]
+                ]
+            )
+
+        @staticmethod
+        def rotXYZ(x,y,z):
+            '''
+            Euler rotation of x,y,z around respective axis.
+            Order: XYZ
+            '''
+            Rx = Vector3.Rotation.rotX(x)
+            Ry = Vector3.Rotation.rotY(y)
+            Rz = Vector3.Rotation.rotZ(z)
+
+            return Rz * Ry * Rx
+        
+        @staticmethod
+        def rotZYX(z,y,x):
+            '''
+            Euler rotation of x,y,z around respective axis.
+            Order: ZYX
+            '''
+            Rx = Vector3.Rotation.rotX(x)
+            Ry = Vector3.Rotation.rotY(y)
+            Rz = Vector3.Rotation.rotZ(z)
+
+            return Rx * Ry * Rz
+        @staticmethod
+        def scaleXYZ(x,y,z):
+            '''
+            Performs a scale of x, y, and z in the respective axis.
+            '''
+            return Matrix.FromRows(
+                [
+                    [x, 0, 0],
+                    [0, y, 0],
+                    [0, 0, z],
+                ]
+            )
+
 if __name__ == '__main__':
-    pass
+    
+    x= Vector3(1,2,3)
+    m = Matrix.FromRows([
+        [1,0,0],
+        [0,1,0],
+        [0,0,1]
+    ])
+
+    y = Vector3(1,2,3)
+
+    print(max(x))
