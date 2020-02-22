@@ -113,8 +113,20 @@ class Matrix:
         else:
             raise TypeError("unsupported operand type(s) for *: {} and {}.".format(type(self).__name__, type(a).__name__))
     __rmul__ = __mul__
+    def __truediv__(self, s):
+        if type(s) in (float, int):
+            out = copy(self.data)
+            for i, column in enumerate(out):
+                for j, n in enumerate(column):
 
-
+                    out[i][j] /= s
+            
+            #makes sure function works for inherited classes
+            outInst = type(self)()
+            outInst.data = out
+            return outInst
+        else:
+            raise TypeError("Cannot divide Matrix by type {}".format(type(s)))
 
     
     @property
@@ -235,15 +247,17 @@ class Matrix:
                     col.append(val)
                 
                 data.append(col)
-
-            return Matrix(data)
-
-                
+            
+            out = type(a)()
+            out.data = data
+            return out          
 class Vector3(Matrix):
 
     def __init__(self, x = 0, y = 0, z = 0):
         super().__init__([[x, y, z]])
-    
+    def __str__(self):
+        return "v({}, {}, {})".format(self.x, self.y, self.z)
+
     @property
     def x(self):
         return self.data[0][0]
@@ -305,13 +319,11 @@ class Vector3(Matrix):
     
     def ToMatrix(self):
         return Matrix(self.data)
+    @staticmethod
+    def FromMatrix(matrix):
+        out = Vector3()
+        out.data = matrix.data
+        return out
 
 if __name__ == '__main__':
-    #testing
-    m = Matrix([[1,0,0],[0,1,0],[0,0,1]])
-    n = Vector3(4,5,6)
-
-    x = (2 * m)
-    y = x * m
-    x.Print()
-    y.Print()
+    pass
