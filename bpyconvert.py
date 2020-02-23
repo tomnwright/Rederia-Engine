@@ -99,19 +99,19 @@ def ConvertObjectTransform(obj):
 
     location = Vector3(
         *tuple(
-            obj.location
+            obj.matrix_world.translation
         )
     )
 
     rotation = Vector3(
         *tuple(
-            obj.rotation_euler
+            obj.matrix_world.to_euler()
         )
     )
 
     scale = Vector3(
         *tuple(
-            obj.scale
+            obj.matrix_world.to_scale()
         )
     )
 
