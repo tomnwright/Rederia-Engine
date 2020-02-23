@@ -1,13 +1,12 @@
 from mathematics import *
 
-
 class Object3D:
     '''
     Parent object class.
     Rotation must be XYZ order.
     '''
     def __init__(self, name, location = Vector3.zero, rotation = Vector3.zero, scale = Vector3.unit):
-        
+
         self.name = name
         self.location = location
         self.rotation = rotation
@@ -78,7 +77,7 @@ class Orthographic(Object3D):
 
         v = rot * (v - self.location)
 
-        return (v.x, v.y,)
+        return Vector2 (v.x, v.y,)
         
     def getpixelscale(self, resolution):
         '''returns pixel length of 1 scene unit'''

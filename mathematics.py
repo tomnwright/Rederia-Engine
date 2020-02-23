@@ -166,7 +166,18 @@ class Matrix:
 
     def Print(self):
         print("\n".join([str(i) for i in self.rows]))
-    
+        
+    def ToInt(self):
+        '''
+        Rounds all data to integer
+        '''
+        out = copy(self)
+        for i, col in enumerate(out.data):
+            for j, item in enumerate(col):
+                out[i][j] = int(round(item))
+
+        return out
+   
     @staticmethod
     def FromRows(rows):
         '''
@@ -278,7 +289,6 @@ class Matrix:
                 
                 data.append(col)
             
-            print(type(a))
             out = type(a)()
             out.data = data
             return out          
@@ -374,14 +384,13 @@ class Vector3(Matrix):
     @property
     def down(self):
         return Vector3(0,0,-1)
-    
-   
+
     @staticmethod
     def FromMatrix(matrix):
         out = Vector3()
         out.data = matrix.data
         return out
-
+    
     class Transform:
         @staticmethod
         def rotX(t):
@@ -429,9 +438,9 @@ class Vector3(Matrix):
             Euler rotation of x,y,z around respective axis.
             Order: XYZ
             '''
-            Rx = Vector3.Rotation.rotX(x)
-            Ry = Vector3.Rotation.rotY(y)
-            Rz = Vector3.Rotation.rotZ(z)
+            Rx = Vector3.Transform.rotX(x)
+            Ry = Vector3.Transform.rotY(y)
+            Rz = Vector3.Transform.rotZ(z)
 
             return Rz * Ry * Rx
         
@@ -441,9 +450,9 @@ class Vector3(Matrix):
             Euler rotation of x,y,z around respective axis.
             Order: ZYX
             '''
-            Rx = Vector3.Rotation.rotX(x)
-            Ry = Vector3.Rotation.rotY(y)
-            Rz = Vector3.Rotation.rotZ(z)
+            Rx = Vector3.Transform.rotX(x)
+            Ry = Vector3.Transform.rotY(y)
+            Rz = Vector3.Transform.rotZ(z)
 
             return Rx * Ry * Rz
         @staticmethod
@@ -459,15 +468,72 @@ class Vector3(Matrix):
                 ]
             )
 
+class Vector2(Matrix):
+
+    def __init__(self, x = 0, y = 0):
+        super().__init__([[x, y]])
+    def __str__(self):
+        return "v({}, {})".format(self.x, self.y)
+    def __iter__(self):
+        yield self.x
+        yield self.y
+    @property
+    def x(self):
+        return self.data[0][0]
+    @x.setter
+    def x(self, value):
+        self.data[0][0] = value
+        return
+
+    @property
+    def y(self):
+        return self.data[0][1]
+    @y.setter
+    def y(self, value):
+        self.data[0][1] = value
+        return
+        
+
+    def ToMatrix(self):
+        return Matrix(self.data)
+
+    def dot(self, v):
+        if not isinstance(v, Vector2):
+            raise TypeError("Cannot calculate dot product of Vector3 and {}".format(type(v)))
+
+        a = self[0]
+        b= v[0]
+
+        return NumberArray.Dot(a, b)
+
+    def straight(self, v):
+        if not isinstance(v, Vector3):
+            raise TypeError("Cannot calculate straight product of Vector3 and {}".format(type(v)))
+
+        out = copy(self)
+        out.x *= v.x
+        out.y *= v.y
+
+        return out
+
+    @property
+    def magnitude(self):
+        return sqrt((self.x ** 2)+(self.y ** 2))
+    @magnitude.setter
+    def magnitude(self, value):
+        scale = value / magnitude
+        #self *= scale
+        return
+
+    @staticmethod
+    def FromMatrix(matrix):
+        out = Vector2()
+        out.data = matrix.data
+        return out
+
+
 if __name__ == '__main__':
-    
-    x= Vector3(1,2,3)
-    m = Matrix.FromRows([
-        [1,0,0],
-        [0,1,0],
-        [0,0,1]
-    ])
-
-    y = Vector3(1,2,3)
-
-    print(max(x))
+    def asdf(a,b):
+        print(a+b)
+    x = Vector2(1.5,2.2)
+    print(x.ToInt())
