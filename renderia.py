@@ -52,6 +52,8 @@ class RenderiaEngine(bpy.types.RenderEngine):
     def render(self, depsgraph):
         
         scene = depsgraph.scene
+        settings = scene.renderiasettings
+        
         scale = scene.render.resolution_percentage / 100.0
         self.size_x = int(scene.render.resolution_x * scale)
         self.size_y = int(scene.render.resolution_y * scale)
@@ -73,8 +75,8 @@ class RenderiaEngine(bpy.types.RenderEngine):
         # Fill the render result with a flat color. The framebuffer is
         # defined as a list of pixels, each pixel itself being a list of
         # R,G,B,A values.
-        bgcolor = [0.05,0.05,0.05, 1.0]
-        linecolor = [1,1,1,1]
+        bgcolor = settings.bgcolour
+        linecolor = settings.wirecolour
 
         pixel_count = self.size_x * self.size_y
         rect = [bgcolor] * pixel_count
@@ -161,6 +163,21 @@ class RenderiaProperties (bpy.types.PropertyGroup):
                 ('RENDERED','Rendered','Rendered (lit) shading', 'SHADING_RENDERED', 3)
                ]
         )
+    bgcolour: bpy.props.FloatVectorProperty(
+        name="Background", 
+        subtype='COLOR', 
+        default=[1.0,1.0,1.0,1.0],
+        size= 4,
+        min = 0.0,
+        max = 1.0)
+    wirecolour: bpy.props.FloatVectorProperty(
+        name="Line", 
+        subtype='COLOR', 
+        default=[0.0,0.0,0.0,1.0],
+        size= 4,
+        min = 0.0,
+        max = 1.0)
+
 
 class RenderiaPanelSettings:
     bl_space_type = 'PROPERTIES'
@@ -181,6 +198,10 @@ class RenderiaPanel(RenderiaPanelSettings, bpy.types.Panel):
         renderiasettings = scene.renderiasettings
 
         layout.prop(renderiasettings, "shading")
+        layout.prop(renderiasettings, "bgcolour")
+
+        if renderiasettings.shading == "WIREFRAME":
+            layout.prop(renderiasettings, "wirecolour")
         
         #layout.prop_search(scene, "RenderCam", scene, "objects")
     
